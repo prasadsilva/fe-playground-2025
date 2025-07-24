@@ -2,6 +2,8 @@
 
 This is an exploration of the latest web technologies and frameworks used in frontend development in 2025.
 
+[The deployed site can be found here.](https://prasadsilva.github.io/fe-playground-2025/)
+
 ## Milestones
 * Created a single page _web_ app (SPA) from scratch (using [Vite](https://vite.dev))
   * `npm create vite@latest . -- --template react-swc-ts`
@@ -14,9 +16,11 @@ This is an exploration of the latest web technologies and frameworks used in fro
 * Added [shadcn/ui](https://ui.shadcn.com) for component and styling support.
   * Shadcn still looks to be the most popular framework in 2025.
   * Works seamlessly with [Tailwind CSS](https://tailwindcss.com).
+* Deployed the app via [Github Pages](https://pages.github.com)
+  * Vite basepath must be set to relative (e.g. `base: ""`) and Tanstack Router config must include the correct base path value (e.g. `basepath: '/fe-playground-2025/'`)
+  * 404 redirection can be achieved by placing a copy of `index.html` named `404.html` in the dist directory prior to publishing.
 
 ## Todo/Ideas
-* Deploy SPA using Github Pages (with 404 redirect)
 * Add app state support (Redux?)
 * Add data fetching support (Tanstack Query?)
 * Add a three.js visualization sample (simple FBX model)
