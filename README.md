@@ -16,6 +16,8 @@ This is an exploration of the latest web technologies and frameworks used in fro
 * Added [shadcn/ui](https://ui.shadcn.com) for component and styling support.
   * Shadcn still looks to be the most popular framework in 2025.
   * Works seamlessly with [Tailwind CSS](https://tailwindcss.com).
+    * Installed [cva IntelliSense](https://cva.style/docs/getting-started/installation#intellisense) for VS Code.
+  * [twMerge](https://github.com/dcastil/tailwind-merge) and [clsx](https://github.com/lukeed/clsx) are used to define the `cn` function that merges classes and resolves conflicts. `clsx` allows for defining classes conditionally in object syntax.
 * Deployed the app via [Github Pages](https://pages.github.com)
   * Vite basepath must be set to relative (e.g. `base: ""`) and Tanstack Router config must include the correct base path value (e.g. `basepath: '/fe-playground-2025/'`)
   * 404 redirection can be achieved by placing a copy of `index.html` named `404.html` in the dist directory prior to publishing.
