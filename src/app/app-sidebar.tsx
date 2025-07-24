@@ -1,6 +1,7 @@
 import { Home, Info, type LucideIcon } from "lucide-react";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../components/ui/sidebar";
 import { Link } from "@tanstack/react-router";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface SidebarLink {
     title: string,
@@ -37,7 +38,7 @@ export function AppSidebar() {
             <SidebarHeader>FE Playground 2025</SidebarHeader>
             <SidebarContent>
                 {groups.map((group) => (
-                    <SidebarGroup>
+                    <SidebarGroup key={group.title}>
                         <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
                         <SidebarGroupContent>
                             <SidebarMenu>
@@ -56,6 +57,9 @@ export function AppSidebar() {
                     </SidebarGroup>
                 ))}
             </SidebarContent>
+            <SidebarFooter>
+                <ThemeToggle />
+            </SidebarFooter>
         </Sidebar>
     )
 }
