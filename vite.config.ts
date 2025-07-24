@@ -21,5 +21,5 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src")
     }
   },
-  // Base path is handled by tanstack router (see main.tsx)
+  base: ""
 })
