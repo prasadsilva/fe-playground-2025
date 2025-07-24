@@ -11,9 +11,11 @@ This is an exploration of the latest web technologies and frameworks used in fro
 * Added [Tanstack Router](https://tanstack.com/router/latest) for routing support.
   * Tanstack Router is TypeScript first and provides type checks for route definitions.
   * Used [virtual file routes](https://tanstack.com/router/latest/docs/framework/react/routing/virtual-file-routes) to have finer control over route definitions and not conform to the already opinionated framework.
+* Added [shadcn/ui](https://ui.shadcn.com) for component and styling support.
+  * Shadcn still looks to be the most popular framework in 2025.
+  * Works seamlessly with [Tailwind CSS](https://tailwindcss.com).
 
 ## Todo/Ideas
-* Add style/theme
 * Deploy SPA using Github Pages (with 404 redirect)
 * Add app state support (Redux?)
 * Add data fetching support (Tanstack Query?)
