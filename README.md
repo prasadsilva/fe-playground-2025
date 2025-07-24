@@ -18,11 +18,13 @@ This is an exploration of the latest web technologies and frameworks used in fro
   * Works seamlessly with [Tailwind CSS](https://tailwindcss.com).
     * Installed [cva IntelliSense](https://cva.style/docs/getting-started/installation#intellisense) for VS Code.
   * [twMerge](https://github.com/dcastil/tailwind-merge) and [clsx](https://github.com/lukeed/clsx) are used to define the `cn` function that merges classes and resolves conflicts. `clsx` allows for defining classes conditionally in object syntax.
-* Deployed the app via [Github Pages](https://pages.github.com)
+* Deployed the app via [Github Pages](https://pages.github.com).
   * Vite basepath must be set to relative (e.g. `base: ""`) and Tanstack Router config must include the correct base path value (e.g. `basepath: '/fe-playground-2025/'`)
   * 404 redirection can be achieved by placing a copy of `index.html` named `404.html` in the dist directory prior to publishing.
+* Added sidebar navigation for the application shell.
 
 ## Todo/Ideas
+* Add dark mode
 * Add app state support (Redux?)
 * Add data fetching support (Tanstack Query?)
 * Add a three.js visualization sample (simple FBX model)

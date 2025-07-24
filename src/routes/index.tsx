@@ -1,10 +1,7 @@
+import { AppIndex } from '@/app/app-index'
 import { createFileRoute } from '@tanstack/react-router'
-import App from '../App'
 
 export const Route = createFileRoute('/')({
-    component: RouteComponent,
+    component: AppIndex,
 })
 
-function RouteComponent() {
-    return <App />
-}

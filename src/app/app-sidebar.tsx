@@ -1,0 +1,61 @@
+import { Home, Info, type LucideIcon } from "lucide-react";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../components/ui/sidebar";
+import { Link } from "@tanstack/react-router";
+
+interface SidebarLink {
+    title: string,
+    url: string,
+    icon: LucideIcon
+}
+
+interface SidebarGroup {
+    title: string,
+    links: SidebarLink[]
+}
+
+const groups: SidebarGroup[] = [
+    {
+        title: 'General',
+        links: [
+            {
+                title: "Home",
+                url: "/",
+                icon: Home
+            },
+            {
+                title: "About",
+                url: "/about",
+                icon: Info
+            }
+        ]
+    }
+]
+
+export function AppSidebar() {
+    return (
+        <Sidebar className="p-3 bg-sidebar">
+            <SidebarHeader>FE Playground 2025</SidebarHeader>
+            <SidebarContent>
+                {groups.map((group) => (
+                    <SidebarGroup>
+                        <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                {group.links.map((link) => (
+                                    <SidebarMenuItem key={link.title}>
+                                        <SidebarMenuButton asChild>
+                                            <Link to={link.url}>
+                                                <link.icon />
+                                                <span>{link.title}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                ))}
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                ))}
+            </SidebarContent>
+        </Sidebar>
+    )
+}
