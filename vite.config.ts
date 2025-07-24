@@ -21,5 +21,5 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src")
     }
   },
-  base: "/fe-playground-2025/"
+  // Base path is handled by tanstack router (see main.tsx)
 })
