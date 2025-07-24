@@ -22,9 +22,10 @@ This is an exploration of the latest web technologies and frameworks used in fro
   * Vite basepath must be set to relative (e.g. `base: ""`) and Tanstack Router config must include the correct base path value (e.g. `basepath: '/fe-playground-2025/'`)
   * 404 redirection can be achieved by placing a copy of `index.html` named `404.html` in the dist directory prior to publishing.
 * Added sidebar navigation for the application shell.
+  * Used shadcn sidebar component.
+* Added dark mode toggle to sidebar footer.
 
 ## Todo/Ideas
-* Add dark mode
 * Add app state support (Redux?)
 * Add data fetching support (Tanstack Query?)
 * Add a three.js visualization sample (simple FBX model)

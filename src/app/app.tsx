@@ -10,8 +10,8 @@ export function App() {
             <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
                 <SidebarProvider>
                     <AppSidebar />
-                    <main>
-                        <SidebarTrigger />
+                    <main className="relative">
+                        <SidebarTrigger className="absolute bottom-0" />
                         <Outlet />
                         {/* <TanStackRouterDevtools /> */}
                     </main>
