@@ -24,6 +24,9 @@ This is an exploration of the latest web technologies and frameworks used in fro
 * Added sidebar navigation for the application shell.
   * Used shadcn sidebar component.
 * Added dark mode toggle to sidebar footer.
+* Added [Apollo client](https://www.apollographql.com/docs/react/get-started) for GraphQL support.
+  * Tested publicly available APIs using [Postman](https://www.postman.com/devrel/graphql-examples/overview).
+  * [GraphQL Voyager](https://graphql-kit.com/graphql-voyager/) is a good visual tool to view the full schema.
 
 ## Todo/Ideas
 * Add app state support (Redux?)
