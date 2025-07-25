@@ -1,43 +1,14 @@
-import { Home, Info, type LucideIcon } from "lucide-react";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../components/ui/sidebar";
 import { Link } from "@tanstack/react-router";
 import { ThemeToggle } from "@/components/theme-toggle";
-
-interface SidebarLink {
-    title: string,
-    url: string,
-    icon: LucideIcon
-}
-
-interface SidebarGroup {
-    title: string,
-    links: SidebarLink[]
-}
-
-const groups: SidebarGroup[] = [
-    {
-        title: 'General',
-        links: [
-            {
-                title: "Home",
-                url: "/",
-                icon: Home
-            },
-            {
-                title: "About",
-                url: "/about",
-                icon: Info
-            }
-        ]
-    }
-]
+import { sidebarGroups } from "@/data/sidebar-data"
 
 export function AppSidebar() {
     return (
         <Sidebar className="p-3 bg-sidebar">
             <SidebarHeader>FE Playground 2025</SidebarHeader>
             <SidebarContent>
-                {groups.map((group) => (
+                {sidebarGroups.map((group) => (
                     <SidebarGroup key={group.title}>
                         <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
                         <SidebarGroupContent>

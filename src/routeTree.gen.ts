@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/root'
 import { Route as aboutRouteImport } from './routes/about'
 import { Route as indexRouteImport } from './routes/index'
+import { Route as projectsSpacexRouteImport } from './routes/projects/spacex'
 
 const aboutRoute = aboutRouteImport.update({
   id: '/about',
@@ -22,31 +23,40 @@ const indexRoute = indexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const projectsSpacexRoute = projectsSpacexRouteImport.update({
+  id: '/projects/spacex',
+  path: '/projects/spacex',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof indexRoute
   '/about': typeof aboutRoute
+  '/projects/spacex': typeof projectsSpacexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof indexRoute
   '/about': typeof aboutRoute
+  '/projects/spacex': typeof projectsSpacexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof indexRoute
   '/about': typeof aboutRoute
+  '/projects/spacex': typeof projectsSpacexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths: '/' | '/about' | '/projects/spacex'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to: '/' | '/about' | '/projects/spacex'
+  id: '__root__' | '/' | '/about' | '/projects/spacex'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   indexRoute: typeof indexRoute
   aboutRoute: typeof aboutRoute
+  projectsSpacexRoute: typeof projectsSpacexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +75,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof indexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/projects/spacex': {
+      id: '/projects/spacex'
+      path: '/projects/spacex'
+      fullPath: '/projects/spacex'
+      preLoaderRoute: typeof projectsSpacexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   indexRoute: indexRoute,
   aboutRoute: aboutRoute,
+  projectsSpacexRoute: projectsSpacexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
