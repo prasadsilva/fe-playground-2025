@@ -13,7 +13,7 @@ export function App() {
                     <main className="relative">
                         <SidebarTrigger className="absolute bottom-0" />
                         <Outlet />
-                        {/* <TanStackRouterDevtools /> */}
+                        <TanStackRouterDevtools />
                     </main>
                 </SidebarProvider>
             </ThemeProvider>
