@@ -3,18 +3,29 @@ import type { Launch } from "./types"
 import { useLaunchesQuery } from "./hooks"
 import { DataTable } from "@/components/ui/data-table"
 import { Skeleton } from "@/components/ui/skeleton"
+import { format } from "date-fns"
 
 const columns: ColumnDef<Launch>[] = [
+    {
+        accessorKey: "launch_date_utc",
+        header: "Launch Date",
+        cell: ({ row }) => {
+            return <div className="">{format(row.getValue("launch_date_utc"), "yyyy-MM-dd")}</div>
+        }
+    },
+    {
+        accessorKey: "launch_date_utc",
+        header: "Launch Time (Local)",
+        cell: ({ row }) => {
+            return <div className="">{format(row.getValue("launch_date_utc"), "p")}</div>
+        }
+    },
     {
         accessorKey: "mission_name",
         header: "Mission Name",
         cell: ({ row }) => {
-            return <div className="whitespace-nowrap">{row.getValue("mission_name")}</div>
+            return <div className="">{row.getValue("mission_name")}</div>
         }
-    },
-    {
-        accessorKey: "details",
-        header: "Details"
     }
 ]
 
@@ -25,7 +36,7 @@ export function LaunchesDataTable() {
 
     return (
         loading ?
-            <Skeleton className="min-w-full h-[200px]" /> :
+            <Skeleton className="w-full h-[200px]" /> :
             <DataTable columns={columns} data={data ? data.launches : []} />
     )
 }
