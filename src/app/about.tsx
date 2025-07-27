@@ -1,3 +1,3 @@
 export function About() {
-    return <div>About</div>
+    return <div className="p-3">About</div>
 }

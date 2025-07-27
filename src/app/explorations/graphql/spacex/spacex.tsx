@@ -9,12 +9,11 @@ const client = new ApolloClient({
 export function SpaceX() {
 
     return (
-        <ApolloProvider client={client}>
-            <div className='p-3 w-auto'>
-                <div>SpaceX</div>
-                <hr />
+        <div className='p-3'>
+            <h1 className='mb-3'>SpaceX Launches</h1>
+            <ApolloProvider client={client}>
                 <LaunchesDataTable />
-            </div>
-        </ApolloProvider>
+            </ApolloProvider>
+        </div >
     )
 }

@@ -6,7 +6,10 @@ import { DataTable } from "@/components/ui/data-table"
 const columns: ColumnDef<Launch>[] = [
     {
         accessorKey: "mission_name",
-        header: "Mission Name"
+        header: "Mission Name",
+        cell: ({ row }) => {
+            return <div className="whitespace-nowrap">{row.getValue("mission_name")}</div>
+        }
     },
     {
         accessorKey: "details",
@@ -24,8 +27,6 @@ export function LaunchesDataTable() {
     console.log(data);
 
     return (
-        <div className="container mx-auto py-10">
-            <DataTable columns={columns} data={data.launches} />
-        </div>
+        <DataTable columns={columns} data={data.launches} />
     )
 }
