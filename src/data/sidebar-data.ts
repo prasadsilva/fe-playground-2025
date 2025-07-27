@@ -1,17 +1,17 @@
 import { Home, Info, Rocket, type LucideIcon } from "lucide-react"
 
-interface SidebarLink {
+export interface SidebarLinkData {
     title: string,
     url: string,
     icon: LucideIcon
 }
 
-interface SidebarGroup {
+export interface SidebarMenuData {
     title: string,
-    links: SidebarLink[]
+    links?: SidebarLinkData[]
 }
 
-export const sidebarGroups: SidebarGroup[] = [
+export const sidebarMenuData: SidebarMenuData[] = [
     {
         title: 'General',
         links: [
@@ -28,11 +28,11 @@ export const sidebarGroups: SidebarGroup[] = [
         ]
     },
     {
-        title: 'Projects',
+        title: 'GraphQL',
         links: [
             {
                 title: "SpaceX Launches",
-                url: "/projects/spacex",
+                url: "/explorations/graphql/spacex",
                 icon: Rocket
             }
         ]

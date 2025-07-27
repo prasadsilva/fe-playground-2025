@@ -11,7 +11,7 @@
 import { Route as rootRouteImport } from './routes/root'
 import { Route as aboutRouteImport } from './routes/about'
 import { Route as indexRouteImport } from './routes/index'
-import { Route as projectsSpacexRouteImport } from './routes/projects/spacex'
+import { Route as explorationsGraphqlSpacexRouteImport } from './routes/explorations/graphql/spacex'
 
 const aboutRoute = aboutRouteImport.update({
   id: '/about',
@@ -23,40 +23,41 @@ const indexRoute = indexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const projectsSpacexRoute = projectsSpacexRouteImport.update({
-  id: '/projects/spacex',
-  path: '/projects/spacex',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const explorationsGraphqlSpacexRoute =
+  explorationsGraphqlSpacexRouteImport.update({
+    id: '/explorations/graphql/spacex',
+    path: '/explorations/graphql/spacex',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof indexRoute
   '/about': typeof aboutRoute
-  '/projects/spacex': typeof projectsSpacexRoute
+  '/explorations/graphql/spacex': typeof explorationsGraphqlSpacexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof indexRoute
   '/about': typeof aboutRoute
-  '/projects/spacex': typeof projectsSpacexRoute
+  '/explorations/graphql/spacex': typeof explorationsGraphqlSpacexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof indexRoute
   '/about': typeof aboutRoute
-  '/projects/spacex': typeof projectsSpacexRoute
+  '/explorations/graphql/spacex': typeof explorationsGraphqlSpacexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/projects/spacex'
+  fullPaths: '/' | '/about' | '/explorations/graphql/spacex'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/projects/spacex'
-  id: '__root__' | '/' | '/about' | '/projects/spacex'
+  to: '/' | '/about' | '/explorations/graphql/spacex'
+  id: '__root__' | '/' | '/about' | '/explorations/graphql/spacex'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   indexRoute: typeof indexRoute
   aboutRoute: typeof aboutRoute
-  projectsSpacexRoute: typeof projectsSpacexRoute
+  explorationsGraphqlSpacexRoute: typeof explorationsGraphqlSpacexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -75,11 +76,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof indexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/projects/spacex': {
-      id: '/projects/spacex'
-      path: '/projects/spacex'
-      fullPath: '/projects/spacex'
-      preLoaderRoute: typeof projectsSpacexRouteImport
+    '/explorations/graphql/spacex': {
+      id: '/explorations/graphql/spacex'
+      path: '/explorations/graphql/spacex'
+      fullPath: '/explorations/graphql/spacex'
+      preLoaderRoute: typeof explorationsGraphqlSpacexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -88,7 +89,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   indexRoute: indexRoute,
   aboutRoute: aboutRoute,
-  projectsSpacexRoute: projectsSpacexRoute,
+  explorationsGraphqlSpacexRoute: explorationsGraphqlSpacexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
