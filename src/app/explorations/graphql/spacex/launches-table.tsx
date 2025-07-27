@@ -2,6 +2,7 @@ import { type ColumnDef } from "@tanstack/react-table"
 import type { Launch } from "./types"
 import { useLaunchesQuery } from "./hooks"
 import { DataTable } from "@/components/ui/data-table"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const columns: ColumnDef<Launch>[] = [
     {
@@ -20,13 +21,11 @@ const columns: ColumnDef<Launch>[] = [
 export function LaunchesDataTable() {
     const { loading, error, data } = useLaunchesQuery()
 
-    if (loading || !data) return <div>Loading...</div>
     if (error) return <div>Error : {error.message}</div>
 
-    // TODO: Remove
-    console.log(data);
-
     return (
-        <DataTable columns={columns} data={data.launches} />
+        loading ?
+            <Skeleton className="min-w-full h-[200px]" /> :
+            <DataTable columns={columns} data={data ? data.launches : []} />
     )
 }
