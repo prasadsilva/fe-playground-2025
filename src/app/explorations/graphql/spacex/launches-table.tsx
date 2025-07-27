@@ -10,21 +10,21 @@ const columns: ColumnDef<Launch>[] = [
         accessorKey: "launch_date_utc",
         header: "Launch Date",
         cell: ({ row }) => {
-            return <div className="">{format(row.getValue("launch_date_utc"), "yyyy-MM-dd")}</div>
+            return <div>{format(row.getValue("launch_date_utc"), "yyyy-MM-dd")}</div>
         }
     },
     {
         accessorKey: "launch_date_utc",
         header: "Launch Time (Local)",
         cell: ({ row }) => {
-            return <div className="">{format(row.getValue("launch_date_utc"), "p")}</div>
+            return <div>{format(row.getValue("launch_date_utc"), "p")}</div>
         }
     },
     {
         accessorKey: "mission_name",
         header: "Mission Name",
         cell: ({ row }) => {
-            return <div className="">{row.getValue("mission_name")}</div>
+            return <div>{row.getValue("mission_name")}</div>
         }
     }
 ]
