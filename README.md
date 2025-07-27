@@ -29,6 +29,8 @@ This is an exploration of the latest web technologies and frameworks used in fro
   * [GraphQL Voyager](https://graphql-kit.com/graphql-voyager/) is a good visual tool to view the full schema.
 
 ## Todo/Ideas
+* Add details route to launches table
+* 
 * Add app state support (Redux?)
 * Add data fetching support (Tanstack Query?)
 * Add a three.js visualization sample (simple FBX model)
