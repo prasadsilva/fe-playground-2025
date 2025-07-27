@@ -1,10 +1,11 @@
-import { type ColumnDef } from "@tanstack/react-table"
+import { type ColumnDef, type Row } from "@tanstack/react-table"
 import type { Launch } from "./types"
 import { useLaunchesQuery, useUnboundedPageIndex } from "./hooks"
 import { DataTable } from "@/components/ui/data-table"
 import { Skeleton } from "@/components/ui/skeleton"
 import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
+import { useCallback } from "react"
 
 const columns: ColumnDef<Launch>[] = [
     {
@@ -36,6 +37,10 @@ export function LaunchesDataTable() {
     const prevButtonDisabled = disableControls || pageIndex === 0;
     const nextButtonDisabled = disableControls || data.launches.length < PAGE_SIZE;
 
+    const handleRowClick = useCallback((row: Row<Launch>) => {
+        console.log(`Clicked on ${row.original.id} - ${row.original.mission_name}`)
+    }, []);
+
     return (
         <>
             <div className="flex flex-row gap-2 pb-2">
@@ -44,8 +49,8 @@ export function LaunchesDataTable() {
             </div>
             {
                 loading ?
-                    <Skeleton className="w-full h-[200px]" /> :
-                    <DataTable columns={columns} data={data ? data.launches : []} />
+                    <Skeleton className="w-full h-[400px]" /> :
+                    <DataTable columns={columns} data={data ? data.launches : []} onRowClick={handleRowClick} />
 
             }
         </>
