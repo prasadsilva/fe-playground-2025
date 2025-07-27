@@ -1,6 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import type { Launches } from "./types";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 // TODO: Trim this down just to id, launch_date_utc and mission_name
 export const GET_LAUNCHES = gql`
@@ -25,8 +25,20 @@ export function useLaunchesQuery(limit: number = 10, offset: number = 0) {
     return useQuery<Launches>(GET_LAUNCHES, { variables: { limit, offset } })
 }
 
-export function useUnboundedPageIndex(initialPageIndex: number = 0) {
-    const [pageIndex, setPageIndex] = useState(initialPageIndex);
+const PAGE_INDEX_KEY = 'explorations-graphql-spacex-launches-pageidx';
+function getPageIndexForSession() {
+    const savedPageIndex = sessionStorage.getItem(PAGE_INDEX_KEY);
+    return savedPageIndex ? Number(savedPageIndex) : 0;
+}
+function setPageIndexForSession(pageIndex: number) {
+    sessionStorage.setItem(PAGE_INDEX_KEY, pageIndex.toString())
+}
+export function useUnboundedPageIndex() {
+    const [pageIndex, setPageIndex] = useState(getPageIndexForSession);
+
+    useEffect(() => {
+        setPageIndexForSession(pageIndex)
+    }, [pageIndex])
 
     const incrementPageIndex = useCallback(() => {
         setPageIndex(pageIndex + 1);
