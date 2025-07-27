@@ -1,24 +1,19 @@
 import { type ColumnDef } from "@tanstack/react-table"
 import type { Launch } from "./types"
-import { useLaunchesQuery } from "./hooks"
+import { useLaunchesQuery, useUnboundedPageIndex } from "./hooks"
 import { DataTable } from "@/components/ui/data-table"
 import { Skeleton } from "@/components/ui/skeleton"
 import { format } from "date-fns"
+import { Button } from "@/components/ui/button"
 
 const columns: ColumnDef<Launch>[] = [
     {
-        accessorKey: "launch_date_utc",
+        accessorFn: (row) => format(row.launch_date_utc, "yyyy-MM-dd"),
         header: "Launch Date",
-        cell: ({ row }) => {
-            return <div>{format(row.getValue("launch_date_utc"), "yyyy-MM-dd")}</div>
-        }
     },
     {
-        accessorKey: "launch_date_utc",
+        accessorFn: (row) => format(row.launch_date_utc, "p"),
         header: "Launch Time (Local)",
-        cell: ({ row }) => {
-            return <div>{format(row.getValue("launch_date_utc"), "p")}</div>
-        }
     },
     {
         accessorKey: "mission_name",
@@ -29,14 +24,30 @@ const columns: ColumnDef<Launch>[] = [
     }
 ]
 
+const PAGE_SIZE = 10
+
 export function LaunchesDataTable() {
-    const { loading, error, data } = useLaunchesQuery()
+    const { pageIndex, decrementPageIndex, incrementPageIndex } = useUnboundedPageIndex();
+    const { loading, error, data } = useLaunchesQuery(PAGE_SIZE, PAGE_SIZE * pageIndex)
 
     if (error) return <div>Error : {error.message}</div>
 
+    const disableControls = loading || !data;
+    const prevButtonDisabled = disableControls || pageIndex === 0;
+    const nextButtonDisabled = disableControls || data.launches.length < PAGE_SIZE;
+
     return (
-        loading ?
-            <Skeleton className="w-full h-[200px]" /> :
-            <DataTable columns={columns} data={data ? data.launches : []} />
+        <>
+            <div className="flex flex-row gap-2 pb-2">
+                <Button disabled={prevButtonDisabled} onClick={decrementPageIndex} className={prevButtonDisabled ? "cursor-default" : "cursor-pointer"}>Previous</Button>
+                <Button disabled={nextButtonDisabled} onClick={incrementPageIndex} className={nextButtonDisabled ? "cursor-default" : "cursor-pointer"}>Next</Button>
+            </div>
+            {
+                loading ?
+                    <Skeleton className="w-full h-[200px]" /> :
+                    <DataTable columns={columns} data={data ? data.launches : []} />
+
+            }
+        </>
     )
 }

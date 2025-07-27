@@ -12,7 +12,7 @@ export interface Launch {
     launch_year: string,
     mission_name: string,
     details: string,
-    launch_date_local: Date,
+    launch_date_utc: string,
     rocket: Rocket,
     links: Links,
 }
