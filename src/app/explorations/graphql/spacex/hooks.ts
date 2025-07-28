@@ -1,6 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
-import { type Launch, type Launches } from "./types";
 import { useCallback, useEffect, useState } from "react";
+import type { Launch, Launches } from "./types";
 
 // TODO: Trim this down just to id, launch_date_utc and mission_name
 export const GET_LAUNCHES = gql`
