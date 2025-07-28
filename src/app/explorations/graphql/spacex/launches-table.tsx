@@ -1,5 +1,5 @@
 import { type Row } from "@tanstack/react-table"
-import type { Launch } from "./types"
+import type { LaunchInfo } from "./types"
 import { useLaunchesQuery, useUnboundedPageIndex } from "./hooks"
 import { DataTable } from "@/components/ui/data-table"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -17,7 +17,7 @@ export function LaunchesDataTable() {
     const prevButtonDisabled = controlsDisabled || pageIndex === 0;
     const nextButtonDisabled = controlsDisabled || data.launches.length < LAUNCHES_TABLE_PAGE_SIZE;
 
-    const handleRowClick = useCallback((row: Row<Launch>) => {
+    const handleRowClick = useCallback((row: Row<LaunchInfo>) => {
         console.log(`Clicked on ${row.original.id} - ${row.original.mission_name}`)
         navigate({
             to: '/explorations/graphql/spacex/launch/$launchId',

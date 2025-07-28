@@ -7,9 +7,8 @@ export interface Links {
     flickr_images: string,
 }
 
-export interface Launch {
+export interface LaunchDetails {
     id: string,
-    launch_year: string,
     mission_name: string,
     details: string,
     launch_date_utc: string,
@@ -17,6 +16,12 @@ export interface Launch {
     links: Links,
 }
 
+export interface LaunchInfo {
+    id: string,
+    mission_name: string,
+    launch_date_utc: string,
+}
+
 export interface Launches {
-    launches: Launch[]
+    launches: LaunchInfo[]
 }

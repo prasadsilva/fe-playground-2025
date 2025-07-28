@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import type { Launches } from "./types";
+import { type LaunchDetails, type Launches } from "./types";
 import { useCallback, useEffect, useState } from "react";
 
 // TODO: Trim this down just to id, launch_date_utc and mission_name
@@ -23,6 +23,26 @@ export const GET_LAUNCHES = gql`
 `
 export function useLaunchesQuery(limit: number = 10, offset: number = 0) {
     return useQuery<Launches>(GET_LAUNCHES, { variables: { limit, offset } })
+}
+
+export const GET_LAUNCH_DETAILS = gql`
+    query GetLaunchDetails($launchId: ID!) {
+        launch(id: $launchId) {
+            id
+            mission_name
+            details
+            rocket {
+                rocket_name
+            }
+            links {
+                video_link
+                flickr_images
+            }
+        }
+    }
+`
+export function useLaunchDetailsQuery(launchId: string) {
+    return useQuery<LaunchDetails>(GET_LAUNCH_DETAILS, { variables: { launchId } })
 }
 
 const PAGE_INDEX_KEY = 'explorations-graphql-spacex-launches-pageidx';
