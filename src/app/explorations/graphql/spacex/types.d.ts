@@ -4,7 +4,7 @@ export interface Rocket {
 
 export interface Links {
     video_link: string,
-    flickr_images: string,
+    flickr_images: string[],
 }
 
 export interface LaunchDetails {
@@ -14,6 +14,10 @@ export interface LaunchDetails {
     launch_date_utc: string,
     rocket: Rocket,
     links: Links,
+}
+
+export interface Launch {
+    launch: LaunchDetails
 }
 
 export interface LaunchInfo {
