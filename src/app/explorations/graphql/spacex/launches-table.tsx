@@ -1,46 +1,31 @@
-import { type ColumnDef, type Row } from "@tanstack/react-table"
+import { type Row } from "@tanstack/react-table"
 import type { Launch } from "./types"
 import { useLaunchesQuery, useUnboundedPageIndex } from "./hooks"
 import { DataTable } from "@/components/ui/data-table"
 import { Skeleton } from "@/components/ui/skeleton"
-import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
 import { useCallback } from "react"
-
-const columns: ColumnDef<Launch>[] = [
-    {
-        accessorFn: (row) => format(row.launch_date_utc, "yyyy-MM-dd"),
-        header: "Launch Date",
-    },
-    {
-        accessorFn: (row) => format(row.launch_date_utc, "p"),
-        header: "Launch Time (Local)",
-    },
-    {
-        accessorKey: "mission_name",
-        header: "Mission Name",
-        cell: ({ row }) => {
-            return <div>{row.getValue("mission_name")}</div>
-        }
-    }
-]
-
-const PAGE_SIZE = 10
+import { useNavigate } from "@tanstack/react-router"
+import { LAUNCHES_TABLE_COLUMNS, LAUNCHES_TABLE_PAGE_SIZE } from "./constants"
 
 export function LaunchesDataTable() {
+    const navigate = useNavigate()
     const { pageIndex, decrementPageIndex, incrementPageIndex } = useUnboundedPageIndex();
-    const { loading, error, data } = useLaunchesQuery(PAGE_SIZE, PAGE_SIZE * pageIndex)
+    const { loading, error, data } = useLaunchesQuery(LAUNCHES_TABLE_PAGE_SIZE, LAUNCHES_TABLE_PAGE_SIZE * pageIndex)
 
-    if (error) return <div>Error : {error.message}</div>
-
-    const disableControls = loading || !data;
-    const prevButtonDisabled = disableControls || pageIndex === 0;
-    const nextButtonDisabled = disableControls || data.launches.length < PAGE_SIZE;
+    const controlsDisabled = loading || !data;
+    const prevButtonDisabled = controlsDisabled || pageIndex === 0;
+    const nextButtonDisabled = controlsDisabled || data.launches.length < LAUNCHES_TABLE_PAGE_SIZE;
 
     const handleRowClick = useCallback((row: Row<Launch>) => {
         console.log(`Clicked on ${row.original.id} - ${row.original.mission_name}`)
+        navigate({
+            to: '/explorations/graphql/spacex/launch/$launchId',
+            params: { launchId: row.original.id }
+        })
     }, []);
 
+    if (error) return <div>Error : {error.message}</div>
     return (
         <>
             <div className="flex flex-row gap-2 pb-2">
@@ -50,7 +35,7 @@ export function LaunchesDataTable() {
             {
                 loading ?
                     <Skeleton className="w-full h-[400px]" /> :
-                    <DataTable columns={columns} data={data ? data.launches : []} onRowClick={handleRowClick} />
+                    <DataTable columns={LAUNCHES_TABLE_COLUMNS} data={data ? data.launches : []} onRowClick={handleRowClick} />
 
             }
         </>

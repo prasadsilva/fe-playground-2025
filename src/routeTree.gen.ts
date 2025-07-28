@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/root'
 import { Route as aboutRouteImport } from './routes/about'
 import { Route as indexRouteImport } from './routes/index'
-import { Route as explorationsGraphqlSpacexRouteImport } from './routes/explorations/graphql/spacex'
+import { Route as explorationsGraphqlSpacexSpacexRouteImport } from './routes/explorations/graphql/spacex/spacex'
+import { Route as explorationsGraphqlSpacexSpacexDotindexRouteImport } from './routes/explorations/graphql/spacex/spacex.index'
+import { Route as explorationsGraphqlSpacexSpacexDotlaunchDotlaunchIdRouteImport } from './routes/explorations/graphql/spacex/spacex.launch.$launchId'
 
 const aboutRoute = aboutRouteImport.update({
   id: '/about',
@@ -23,41 +25,73 @@ const indexRoute = indexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const explorationsGraphqlSpacexRoute =
-  explorationsGraphqlSpacexRouteImport.update({
+const explorationsGraphqlSpacexSpacexRoute =
+  explorationsGraphqlSpacexSpacexRouteImport.update({
     id: '/explorations/graphql/spacex',
     path: '/explorations/graphql/spacex',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const explorationsGraphqlSpacexSpacexDotindexRoute =
+  explorationsGraphqlSpacexSpacexDotindexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => explorationsGraphqlSpacexSpacexRoute,
+  } as any)
+const explorationsGraphqlSpacexSpacexDotlaunchDotlaunchIdRoute =
+  explorationsGraphqlSpacexSpacexDotlaunchDotlaunchIdRouteImport.update({
+    id: '/launch/$launchId',
+    path: '/launch/$launchId',
+    getParentRoute: () => explorationsGraphqlSpacexSpacexRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof indexRoute
   '/about': typeof aboutRoute
-  '/explorations/graphql/spacex': typeof explorationsGraphqlSpacexRoute
+  '/explorations/graphql/spacex': typeof explorationsGraphqlSpacexSpacexRouteWithChildren
+  '/explorations/graphql/spacex/': typeof explorationsGraphqlSpacexSpacexDotindexRoute
+  '/explorations/graphql/spacex/launch/$launchId': typeof explorationsGraphqlSpacexSpacexDotlaunchDotlaunchIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof indexRoute
   '/about': typeof aboutRoute
-  '/explorations/graphql/spacex': typeof explorationsGraphqlSpacexRoute
+  '/explorations/graphql/spacex': typeof explorationsGraphqlSpacexSpacexDotindexRoute
+  '/explorations/graphql/spacex/launch/$launchId': typeof explorationsGraphqlSpacexSpacexDotlaunchDotlaunchIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof indexRoute
   '/about': typeof aboutRoute
-  '/explorations/graphql/spacex': typeof explorationsGraphqlSpacexRoute
+  '/explorations/graphql/spacex': typeof explorationsGraphqlSpacexSpacexRouteWithChildren
+  '/explorations/graphql/spacex/': typeof explorationsGraphqlSpacexSpacexDotindexRoute
+  '/explorations/graphql/spacex/launch/$launchId': typeof explorationsGraphqlSpacexSpacexDotlaunchDotlaunchIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/explorations/graphql/spacex'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/explorations/graphql/spacex'
+    | '/explorations/graphql/spacex/'
+    | '/explorations/graphql/spacex/launch/$launchId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/explorations/graphql/spacex'
-  id: '__root__' | '/' | '/about' | '/explorations/graphql/spacex'
+  to:
+    | '/'
+    | '/about'
+    | '/explorations/graphql/spacex'
+    | '/explorations/graphql/spacex/launch/$launchId'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/explorations/graphql/spacex'
+    | '/explorations/graphql/spacex/'
+    | '/explorations/graphql/spacex/launch/$launchId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   indexRoute: typeof indexRoute
   aboutRoute: typeof aboutRoute
-  explorationsGraphqlSpacexRoute: typeof explorationsGraphqlSpacexRoute
+  explorationsGraphqlSpacexSpacexRoute: typeof explorationsGraphqlSpacexSpacexRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -80,16 +114,49 @@ declare module '@tanstack/react-router' {
       id: '/explorations/graphql/spacex'
       path: '/explorations/graphql/spacex'
       fullPath: '/explorations/graphql/spacex'
-      preLoaderRoute: typeof explorationsGraphqlSpacexRouteImport
+      preLoaderRoute: typeof explorationsGraphqlSpacexSpacexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/explorations/graphql/spacex/': {
+      id: '/explorations/graphql/spacex/'
+      path: '/'
+      fullPath: '/explorations/graphql/spacex/'
+      preLoaderRoute: typeof explorationsGraphqlSpacexSpacexDotindexRouteImport
+      parentRoute: typeof explorationsGraphqlSpacexSpacexRoute
+    }
+    '/explorations/graphql/spacex/launch/$launchId': {
+      id: '/explorations/graphql/spacex/launch/$launchId'
+      path: '/launch/$launchId'
+      fullPath: '/explorations/graphql/spacex/launch/$launchId'
+      preLoaderRoute: typeof explorationsGraphqlSpacexSpacexDotlaunchDotlaunchIdRouteImport
+      parentRoute: typeof explorationsGraphqlSpacexSpacexRoute
     }
   }
 }
 
+interface explorationsGraphqlSpacexSpacexRouteChildren {
+  explorationsGraphqlSpacexSpacexDotindexRoute: typeof explorationsGraphqlSpacexSpacexDotindexRoute
+  explorationsGraphqlSpacexSpacexDotlaunchDotlaunchIdRoute: typeof explorationsGraphqlSpacexSpacexDotlaunchDotlaunchIdRoute
+}
+
+const explorationsGraphqlSpacexSpacexRouteChildren: explorationsGraphqlSpacexSpacexRouteChildren =
+  {
+    explorationsGraphqlSpacexSpacexDotindexRoute:
+      explorationsGraphqlSpacexSpacexDotindexRoute,
+    explorationsGraphqlSpacexSpacexDotlaunchDotlaunchIdRoute:
+      explorationsGraphqlSpacexSpacexDotlaunchDotlaunchIdRoute,
+  }
+
+const explorationsGraphqlSpacexSpacexRouteWithChildren =
+  explorationsGraphqlSpacexSpacexRoute._addFileChildren(
+    explorationsGraphqlSpacexSpacexRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   indexRoute: indexRoute,
   aboutRoute: aboutRoute,
-  explorationsGraphqlSpacexRoute: explorationsGraphqlSpacexRoute,
+  explorationsGraphqlSpacexSpacexRoute:
+    explorationsGraphqlSpacexSpacexRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

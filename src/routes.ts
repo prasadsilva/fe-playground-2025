@@ -8,5 +8,8 @@ import { index, rootRoute, route } from '@tanstack/virtual-file-routes'
 export const routes = rootRoute('root.tsx', [
     index('index.tsx'),
     route('/about', 'about.tsx'),
-    route('/explorations/graphql/spacex', 'explorations/graphql/spacex.tsx')
+    route('/explorations/graphql/spacex', 'explorations/graphql/spacex/spacex.tsx', [
+        index('explorations/graphql/spacex/spacex.index.tsx'),
+        route('/launch/$launchId', 'explorations/graphql/spacex/spacex.launch.$launchId.tsx')
+    ])
 ]);
