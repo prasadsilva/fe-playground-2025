@@ -5,16 +5,20 @@ interface TechStackItemProps {
 }
 function TechStackItem({ stackItem }: TechStackItemProps) {
     return (
-        <a href={stackItem.url} target='_blank'>
-            <div className="h-10 p-2 rounded-t-sm bg-slate-600/15 text-slate-900 text-sm">{stackItem.category}</div>
-            <div className={`relative p-2 h-full`}>
-                <div className='pb-2 font-semibold'>{stackItem.chosenStack}</div>
-                <div className='text-xs'>{stackItem.description}</div>
-                <div className='absolute -z-10 top-1 right-1 opacity-15 size-full overflow-hidden'>
-                    <img src={stackItem.logoImg} className='absolute h-[150px] right-0' />
+        <>
+            <div className="h-10 p-2 bg-slate-800 text-slate-300 dark:text-slate-300 text-sm">{stackItem.category}</div>
+            <a href={stackItem.url} target='_blank'>
+                <div className={`relative size-full`}>
+                    <div className="p-2">
+                        <div className='pb-2 font-semibold'>{stackItem.chosenStack}</div>
+                        <div className='text-xs'>{stackItem.description}</div>
+                    </div>
+                    <div className='absolute dark:bg-slate-700 dark:in-[a:hover]:bg-slate-600 -z-1 top-0 left-0 size-full transition-colors duration-300 ease-in-out'>
+                        <img src={stackItem.logoImg} className='absolute h-[150px] in-[a:hover]:h-[175px] opacity-15 right-0 transition-[height] duration-2000 ease-in-out' />
+                    </div>
                 </div>
-            </div>
-        </a>
+            </a>
+        </>
     )
 }
 
@@ -28,7 +32,7 @@ export function About() {
                 <div className="font-semibold pt-0">Current stack</div>
                 <ul className="flex flex-row gap-3 flex-wrap">
                     {techStackItemsData.map((techStackItem, idx) =>
-                        <li key={`stackItem_${idx}`} className="w-[300px] h-[160px] overflow-hidden rounded-sm shadow-lg outline outline-black/5 dark:bg-slate-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10">
+                        <li key={`stackItem_${idx}`} className="w-[300px] h-[160px] overflow-hidden rounded-sm shadow-sm hover:shadow-xl dark:shadow-none transition-shadow duration-200 ease-in outline outline-black/5 dark:-outline-offset-1 dark:outline-white/10">
                             <TechStackItem stackItem={techStackItem} />
                         </li>
                     )}

@@ -21,5 +21,5 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src")
     }
   },
-  base: ""
+  base: "/fe-playground-2025"
 })
