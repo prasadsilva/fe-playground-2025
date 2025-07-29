@@ -27,9 +27,13 @@ This is an exploration of the latest web technologies and frameworks used in fro
 * Added [Apollo client](https://www.apollographql.com/docs/react/get-started) for GraphQL support.
   * Tested publicly available APIs using [Postman](https://www.postman.com/devrel/graphql-examples/overview).
   * [GraphQL Voyager](https://graphql-kit.com/graphql-voyager/) is a good visual tool to view the full schema.
+* Added SpaceX Launches demo
+  * Index lists all launches available in the public API.
+  * Clicking on an individual launch entry navigates to its detail view.
+* Added current stack to About page.
 
 ## Todo/Ideas
-* Add details route to launches table
+* Prettify the SpaceX launch detail view
 * 
 * Add app state support (Redux?)
 * Add data fetching support (Tanstack Query?)
