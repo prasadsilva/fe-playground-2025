@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/root'
 import { Route as aboutRouteImport } from './routes/about'
 import { Route as indexRouteImport } from './routes/index'
+import { Route as explorationsInteractionsPlayingCardsRouteImport } from './routes/explorations/interactions/playing-cards'
 import { Route as explorationsGraphqlSpacexSpacexRouteImport } from './routes/explorations/graphql/spacex/spacex'
 import { Route as explorationsGraphqlSpacexSpacexDotindexRouteImport } from './routes/explorations/graphql/spacex/spacex.index'
 import { Route as explorationsGraphqlSpacexSpacexDotlaunchDotlaunchIdRouteImport } from './routes/explorations/graphql/spacex/spacex.launch.$launchId'
@@ -25,6 +26,12 @@ const indexRoute = indexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const explorationsInteractionsPlayingCardsRoute =
+  explorationsInteractionsPlayingCardsRouteImport.update({
+    id: '/explorations/interactions/playing-cards',
+    path: '/explorations/interactions/playing-cards',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const explorationsGraphqlSpacexSpacexRoute =
   explorationsGraphqlSpacexSpacexRouteImport.update({
     id: '/explorations/graphql/spacex',
@@ -48,12 +55,14 @@ export interface FileRoutesByFullPath {
   '/': typeof indexRoute
   '/about': typeof aboutRoute
   '/explorations/graphql/spacex': typeof explorationsGraphqlSpacexSpacexRouteWithChildren
+  '/explorations/interactions/playing-cards': typeof explorationsInteractionsPlayingCardsRoute
   '/explorations/graphql/spacex/': typeof explorationsGraphqlSpacexSpacexDotindexRoute
   '/explorations/graphql/spacex/launch/$launchId': typeof explorationsGraphqlSpacexSpacexDotlaunchDotlaunchIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof indexRoute
   '/about': typeof aboutRoute
+  '/explorations/interactions/playing-cards': typeof explorationsInteractionsPlayingCardsRoute
   '/explorations/graphql/spacex': typeof explorationsGraphqlSpacexSpacexDotindexRoute
   '/explorations/graphql/spacex/launch/$launchId': typeof explorationsGraphqlSpacexSpacexDotlaunchDotlaunchIdRoute
 }
@@ -62,6 +71,7 @@ export interface FileRoutesById {
   '/': typeof indexRoute
   '/about': typeof aboutRoute
   '/explorations/graphql/spacex': typeof explorationsGraphqlSpacexSpacexRouteWithChildren
+  '/explorations/interactions/playing-cards': typeof explorationsInteractionsPlayingCardsRoute
   '/explorations/graphql/spacex/': typeof explorationsGraphqlSpacexSpacexDotindexRoute
   '/explorations/graphql/spacex/launch/$launchId': typeof explorationsGraphqlSpacexSpacexDotlaunchDotlaunchIdRoute
 }
@@ -71,12 +81,14 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/explorations/graphql/spacex'
+    | '/explorations/interactions/playing-cards'
     | '/explorations/graphql/spacex/'
     | '/explorations/graphql/spacex/launch/$launchId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/explorations/interactions/playing-cards'
     | '/explorations/graphql/spacex'
     | '/explorations/graphql/spacex/launch/$launchId'
   id:
@@ -84,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/explorations/graphql/spacex'
+    | '/explorations/interactions/playing-cards'
     | '/explorations/graphql/spacex/'
     | '/explorations/graphql/spacex/launch/$launchId'
   fileRoutesById: FileRoutesById
@@ -92,6 +105,7 @@ export interface RootRouteChildren {
   indexRoute: typeof indexRoute
   aboutRoute: typeof aboutRoute
   explorationsGraphqlSpacexSpacexRoute: typeof explorationsGraphqlSpacexSpacexRouteWithChildren
+  explorationsInteractionsPlayingCardsRoute: typeof explorationsInteractionsPlayingCardsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -108,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof indexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explorations/interactions/playing-cards': {
+      id: '/explorations/interactions/playing-cards'
+      path: '/explorations/interactions/playing-cards'
+      fullPath: '/explorations/interactions/playing-cards'
+      preLoaderRoute: typeof explorationsInteractionsPlayingCardsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/explorations/graphql/spacex': {
@@ -157,6 +178,8 @@ const rootRouteChildren: RootRouteChildren = {
   aboutRoute: aboutRoute,
   explorationsGraphqlSpacexSpacexRoute:
     explorationsGraphqlSpacexSpacexRouteWithChildren,
+  explorationsInteractionsPlayingCardsRoute:
+    explorationsInteractionsPlayingCardsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

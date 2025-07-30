@@ -11,5 +11,6 @@ export const routes = rootRoute('root.tsx', [
     route('/explorations/graphql/spacex', 'explorations/graphql/spacex/spacex.tsx', [
         index('explorations/graphql/spacex/spacex.index.tsx'),
         route('/launch/$launchId', 'explorations/graphql/spacex/spacex.launch.$launchId.tsx')
-    ])
+    ]),
+    route('/explorations/interactions/playing-cards', 'explorations/interactions/playing-cards.tsx')
 ]);

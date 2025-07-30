@@ -1,4 +1,4 @@
-import { Home, Info, Rocket, type LucideIcon } from "lucide-react"
+import { Club, Home, Info, Rocket, type LucideIcon } from "lucide-react"
 
 export interface SidebarLinkData {
     title: string,
@@ -34,6 +34,16 @@ export const sidebarMenuData: SidebarMenuData[] = [
                 title: "SpaceX Launches",
                 url: "/explorations/graphql/spacex",
                 icon: Rocket
+            }
+        ]
+    },
+    {
+        title: 'Interactions',
+        links: [
+            {
+                title: "Playing Cards",
+                url: "/explorations/interactions/playing-cards",
+                icon: Club
             }
         ]
     }

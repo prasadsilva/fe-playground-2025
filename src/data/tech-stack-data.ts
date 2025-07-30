@@ -1,8 +1,8 @@
-import ReactLogoSvg from '@/img/react-logo.svg?no-inline'
-import ViteLogoSvg from '@/img/vite-logo.svg?no-inline'
-import TailwindCssLogoSvg from '@/img/tailwindcss-logo.svg?no-inline'
-import ShadcnUiLogoSvg from '@/img/shadcn-ui-logo.svg?no-inline'
-import TanstackLogoPng from '@/img/tanstack-logo.png'
+import ReactLogoSvg from '@/img/logos/react-logo.svg?no-inline'
+import ViteLogoSvg from '@/img/logos/vite-logo.svg?no-inline'
+import TailwindCssLogoSvg from '@/img/logos/tailwindcss-logo.svg?no-inline'
+import ShadcnUiLogoSvg from '@/img/logos/shadcn-ui-logo.svg?no-inline'
+import TanstackLogoPng from '@/img/logos/tanstack-logo.png'
 
 export interface TechStackItemData {
     category: string,
