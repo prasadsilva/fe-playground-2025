@@ -48,6 +48,7 @@ export function PlayingCard({ name, data, initialCanvasPosition }: PlayingCardPr
                 zIndex: dragging ? '100' : '10'
             }}
             onPointerDown={handlePointerCapture}
+            draggable={false}
         >
             <img src={data.cardImg} className="h-full" />
         </div>
