@@ -37,7 +37,7 @@ This is an exploration of the latest web technologies and frameworks used in fro
 * Prettify the SpaceX launch detail view
 * Add a D3.js visualization sample (time series chart?)
   * Find a free time series API
-* 
+* Add React Flow exploration
 * Add app state support (Redux?)
 * Add data fetching support (Tanstack Query?)
 * Add a three.js visualization sample (simple FBX model)
