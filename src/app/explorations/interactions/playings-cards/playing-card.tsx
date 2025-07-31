@@ -5,53 +5,30 @@ import { DraggingContext } from "./dragging-context";
 export interface PlayingCardProps {
     name: string,
     data: PlayingCardData,
-    canvasPosition: {
+    initialCanvasPosition: {
         x: number,
         y: number
     },
 }
-export function PlayingCard({ name, data, canvasPosition }: PlayingCardProps) {
+export function PlayingCard({ name, data, initialCanvasPosition }: PlayingCardProps) {
     const objRef = useRef<HTMLDivElement>(null)
     const draggingContext = useContext(DraggingContext)
     const [translate, setTranslate] = useState({
-        x: canvasPosition.x,
-        y: canvasPosition.y
+        x: initialCanvasPosition.x,
+        y: initialCanvasPosition.y
     });
 
-    const registerPointerReleaseCallbacks = useCallback(() => {
-        if (!objRef.current) return;
-        const element = objRef.current;
-        element.addEventListener('pointerup', handlePointerReleaseNative)
-        element.addEventListener('pointerleave', handlePointerReleaseNative)
-        element.addEventListener('pointercancel', handlePointerReleaseNative)
+    // TODO: Maybe all of this logic can be done in a useEffect by passing the ref to the context?
+    //       dragginContext.registerDraggable(objRef)
+    const handlePointerCapture = useCallback((_e: React.PointerEvent) => {
+        if (!objRef || !objRef.current) return;
+        draggingContext.setDragHandler(handleDrag)
     }, [objRef])
 
-    const unregisterPointerReleaseCallbacks = useCallback(() => {
-        if (!objRef.current) return;
-        const element = objRef.current;
-        element.removeEventListener('pointerup', handlePointerReleaseNative)
-        element.removeEventListener('pointerleave', handlePointerReleaseNative)
-        element.removeEventListener('pointercancel', handlePointerReleaseNative)
-    }, [objRef])
-
-    const handlePointerCapture = useCallback((e: React.PointerEvent) => {
-        console.log('handlePointerCapture')
-        if (!objRef) return;
-        registerPointerReleaseCallbacks()
-        draggingContext.setDragObject(objRef, e.clientX, e.clientY, handleDrag)
-    }, [objRef])
-
-    const handlePointerReleaseNative = useCallback((_e: PointerEvent) => {
-        console.log('handlePointerReleaseNative')
-        unregisterPointerReleaseCallbacks()
-        draggingContext.clearDragObject(objRef)
-    }, [objRef])
-
-    const handleDrag = useCallback((e: PointerEvent) => {
-        console.log(`handleDrag called for ${name}`)
+    const handleDrag = useCallback((canvasDeltaX: number, canvasDeltaY: number) => {
         setTranslate(prev => ({
-            x: prev.x + e.movementX,
-            y: prev.y + e.movementY
+            x: prev.x + canvasDeltaX,
+            y: prev.y + canvasDeltaY
         }))
     }, [])
 

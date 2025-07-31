@@ -2,76 +2,85 @@ import { createContext, type RefObject } from "react"
 
 export class DraggingContextData {
     private canvasRef: RefObject<HTMLElement | null> | undefined
-    private trackedObjRef: RefObject<HTMLElement | null> | undefined
-    private trackedObjDragMoveCallback: ((e: PointerEvent) => void) | undefined
-    private dragOffsetX: number
-    private dragOffsetY: number
-    // private lastPointerClientX: number
-    // private lastPointerClientY: number
+    private trackedObjDragMoveCallback: ((canvasDeltaX: number, canvasDeltaY: number) => void) | undefined
+    private canvasPointerClientX: number
+    private canvasPointerClientY: number
 
     public constructor() {
-        console.log('ctor')
         this.canvasRef = undefined
-        this.trackedObjRef = undefined
         this.trackedObjDragMoveCallback = undefined
-        this.dragOffsetX = -1
-        this.dragOffsetY = -1
-        // this.targetX = -1
-        // this.targetY = -1
-        // this.lastPointerClientX = -1
-        // this.lastPointerClientY = -1
+        this.canvasPointerClientX = -1
+        this.canvasPointerClientY = -1
     }
 
-    private handlePointerMove = (e: PointerEvent) => {
-        if (!this.trackedObjRef || !this.trackedObjRef.current) return;
-        console.log(`pointer move for -> ${this.trackedObjRef.current.getAttribute('id')}`);
-        if (!this.trackedObjDragMoveCallback) return;
-        this.trackedObjDragMoveCallback(e)
-
-        // const deltaX = e.clientX - this.lastPointerClientX
-        // const deltaY = e.clientY - this.lastPointerClientY
-        // const element = this.trackedObjRef.current
-        // this.trackedObjRef.current.style.left = `${e.clientX - this.dragOffsetX}px`
-        // this.trackedObjRef.current.style.top = `${e.clientX - this.dragOffsetY}px`
-        // element.style.translate = `${deltaX}px ${deltaY}px`
-        // this.lastPointerClientX = e.clientX
-        // this.lastPointerClientY = e.clientY
+    private trackCanvasPointer = (e: PointerEvent) => {
+        const deltaX = e.clientX - this.canvasPointerClientX
+        const deltaY = e.clientY - this.canvasPointerClientY
+        if (this.trackedObjDragMoveCallback) {
+            this.trackedObjDragMoveCallback(deltaX, deltaY)
+        }
+        this.canvasPointerClientX = e.clientX
+        this.canvasPointerClientY = e.clientY
     }
 
-    public setDragObject = (objRef: RefObject<HTMLElement | null>, pointerClientX: number, pointerClientY: number, onDragMove: (e: PointerEvent) => void) => {
-        if (!this.canvasRef || !this.canvasRef.current) return
-        if (this.trackedObjDragMoveCallback) return
-        console.log(`setDragObject: ${objRef}`)
-        this.trackedObjRef = objRef
+    private registerPointerReleaseCallbacks = () => {
+        document.body.addEventListener('pointerup', this.handlePointerReleaseNative)
+        document.body.addEventListener('pointerleave', this.handlePointerReleaseNative)
+        document.body.addEventListener('pointercancel', this.handlePointerReleaseNative)
+    }
+
+    private unregisterPointerReleaseCallbacks = () => {
+        document.body.removeEventListener('pointerup', this.handlePointerReleaseNative)
+        document.body.removeEventListener('pointerleave', this.handlePointerReleaseNative)
+        document.body.removeEventListener('pointercancel', this.handlePointerReleaseNative)
+    }
+
+    private handlePointerReleaseNative = (_e: PointerEvent) => {
+        this.clearDragObject()
+    }
+
+    public setDragHandler = (onDragMove: (canvasDltaX: number, canvasDeltaY: number) => void) => {
+        // Already dragging - bail
+        if (this.trackedObjDragMoveCallback) {
+            console.warn('Already in drag mode')
+            return
+        }
+
+        // Track elements
         this.trackedObjDragMoveCallback = onDragMove
-        if (!this.trackedObjRef || !this.trackedObjRef.current) return;
-        const element = this.trackedObjRef.current
-        console.log(`pointer down on -> ${element.getAttribute('id')}`);
-        // if (!objRef || !objRef.current) return;
-        // console.log(`pointer down on -> ${objRef.current.getAttribute('id')}`);
-        // console.dir(objRef.current, { depth: 3 })
-        window.addEventListener('pointermove', this.handlePointerMove);
-        const targetClientRect = element.getBoundingClientRect()
 
-        // this.lastPointerClientX = pointerClientX
-        // this.lastPointerClientY = pointerClientY
-        this.dragOffsetX = pointerClientX - targetClientRect.x
-        this.dragOffsetY = pointerClientY - targetClientRect.y
-        console.log(`drag offsets: ${this.dragOffsetX}, ${this.dragOffsetY}`)
+        // Register event listeners
+        this.registerPointerReleaseCallbacks()
+
     }
-    public clearDragObject = (objRef: RefObject<HTMLElement | null>) => {
-        if (!this.canvasRef || !this.canvasRef.current) return
-        this.trackedObjRef = objRef
+    public clearDragObject = () => {
+        // Not dragging - bail
+        if (!this.trackedObjDragMoveCallback) {
+            console.warn('Unable to clear drag object. Not currently dragging an element.')
+            return
+        }
+
+        // Clear elements
         this.trackedObjDragMoveCallback = undefined
-        if (!this.trackedObjRef || !this.trackedObjRef.current) return;
-        console.log(`pointer up on -> ${this.trackedObjRef.current.getAttribute('id')}`);
-        // if (!objRef || !objRef.current) return;
-        // console.log(`pointer up on -> ${objRef.current.getAttribute('id')}`);
-        // console.dir(objRef.current, { depth: 3 })
-        window.removeEventListener('pointermove', this.handlePointerMove)
+
+        // Unregister event listeners
+        this.unregisterPointerReleaseCallbacks()
     }
-    public setCanvas = (canvasRef: RefObject<HTMLElement | null>) => {
+
+    public registerCanvas = (canvasRef: RefObject<HTMLElement | null>) => {
+        if (this.canvasRef) {
+            return
+        }
         this.canvasRef = canvasRef
+        if (!this.canvasRef.current) {
+            console.warn('Unable to register canvas. Current reference is invalid.')
+            return
+        }
+        document.body.addEventListener('pointermove', this.trackCanvasPointer)
+    }
+    public unregisterCanvas = (_canvasRef: RefObject<HTMLElement | null>) => {
+        document.body.removeEventListener('pointermove', this.trackCanvasPointer)
+        this.canvasRef = undefined
     }
 }
 type InstanceType<T extends abstract new (...args: any) => any> = T extends abstract new (...args: any) => infer R ? R : any;
