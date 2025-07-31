@@ -17,12 +17,14 @@ export function PlayingCard({ name, data, initialCanvasPosition }: PlayingCardPr
         x: initialCanvasPosition.x,
         y: initialCanvasPosition.y
     });
+    const [dragging, setDragging] = useState(false)
 
     // TODO: Maybe all of this logic can be done in a useEffect by passing the ref to the context?
     //       dragginContext.registerDraggable(objRef)
     const handlePointerCapture = useCallback((_e: React.PointerEvent) => {
         if (!objRef || !objRef.current) return;
-        draggingContext.setDragHandler(handleDrag)
+        setDragging(true)
+        draggingContext.setDragHandler(handleDrag, handleEndDrag)
     }, [objRef])
 
     const handleDrag = useCallback((canvasDeltaX: number, canvasDeltaY: number) => {
@@ -32,13 +34,18 @@ export function PlayingCard({ name, data, initialCanvasPosition }: PlayingCardPr
         }))
     }, [])
 
+    const handleEndDrag = useCallback(() => {
+        setDragging(false)
+    }, [])
+
     return (
         <div
             id={name}
             ref={objRef}
             className="absolute h-36"
             style={{
-                transform: `translateX(${translate.x}px) translateY(${translate.y}px)`
+                transform: `translateX(${translate.x}px) translateY(${translate.y}px)`,
+                zIndex: dragging ? '100' : '10'
             }}
             onPointerDown={handlePointerCapture}
         >

@@ -3,12 +3,14 @@ import { createContext, type RefObject } from "react"
 export class DraggingContextData {
     private canvasRef: RefObject<HTMLElement | null> | undefined
     private trackedObjDragMoveCallback: ((canvasDeltaX: number, canvasDeltaY: number) => void) | undefined
+    private trackedObjDragEndCallback: (() => void) | undefined
     private canvasPointerClientX: number
     private canvasPointerClientY: number
 
     public constructor() {
         this.canvasRef = undefined
         this.trackedObjDragMoveCallback = undefined
+        this.trackedObjDragEndCallback = undefined
         this.canvasPointerClientX = -1
         this.canvasPointerClientY = -1
     }
@@ -39,7 +41,7 @@ export class DraggingContextData {
         this.clearDragObject()
     }
 
-    public setDragHandler = (onDragMove: (canvasDltaX: number, canvasDeltaY: number) => void) => {
+    public setDragHandler = (onDragMove: (canvasDltaX: number, canvasDeltaY: number) => void, onDragEnd: () => void) => {
         // Already dragging - bail
         if (this.trackedObjDragMoveCallback) {
             console.warn('Already in drag mode')
@@ -48,6 +50,7 @@ export class DraggingContextData {
 
         // Track elements
         this.trackedObjDragMoveCallback = onDragMove
+        this.trackedObjDragEndCallback = onDragEnd
 
         // Register event listeners
         this.registerPointerReleaseCallbacks()
@@ -62,6 +65,10 @@ export class DraggingContextData {
 
         // Clear elements
         this.trackedObjDragMoveCallback = undefined
+        if (this.trackedObjDragEndCallback) {
+            this.trackedObjDragEndCallback()
+        }
+        this.trackedObjDragEndCallback = undefined
 
         // Unregister event listeners
         this.unregisterPointerReleaseCallbacks()
