@@ -2,6 +2,7 @@ import type { ComponentProps } from "react"
 import type { PlayingCardStackData } from "./types"
 import { PlayingCard } from "./playing-card"
 import { PlayingCardDropTarget } from "./playing-card-drop-target"
+import CardOutline from '@/img/playing-cards/outline.svg'
 
 const STACKED_CARD_Y_OFFSET = 24 // px
 
@@ -11,11 +12,32 @@ export interface PlayingCardsStackProps extends ComponentProps<'div'> {
 export function PlayingCardsStack({ cardStack }: PlayingCardsStackProps) {
     return (
         <>
+            <div
+                className={`absolute h-36 w-fit`}
+                style={{
+                    left: `${cardStack.position.x}px`,
+                    top: `${cardStack.position.y}px`,
+                    zIndex: -10,
+                    pointerEvents: 'none'
+                }}>
+                <img src={CardOutline} className="h-full" />
+            </div>
             {
-                cardStack.cards.map((card, idx) => <PlayingCard key={`card-${card.parentStackId}-${card.cardIndex}`} card={card} position={{ x: cardStack.position.x, y: cardStack.position.y + (idx * STACKED_CARD_Y_OFFSET) }} />)
+                cardStack.cards.map((card, idx) => (
+                    <PlayingCard
+                        key={`card-${card.parentStackId}-${card.cardIndex}`}
+                        card={card}
+                        position={{ x: cardStack.position.x, y: cardStack.position.y + (idx * STACKED_CARD_Y_OFFSET) }}
+                    />)
+                )
             }
             {
-                cardStack.hasDropTarget && <PlayingCardDropTarget representativeCardIdx={cardStack.cards.length} position={{ x: cardStack.position.x, y: cardStack.position.y + (cardStack.cards.length * STACKED_CARD_Y_OFFSET) }} />
+                cardStack.hasDropTarget &&
+                <PlayingCardDropTarget
+                    parentStackId={cardStack.stackId}
+                    representativeCardIdx={cardStack.cards.length}
+                    position={{ x: cardStack.position.x, y: cardStack.position.y + (cardStack.cards.length * STACKED_CARD_Y_OFFSET) }}
+                />
             }
         </>
     )

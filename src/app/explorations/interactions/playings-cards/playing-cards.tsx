@@ -4,8 +4,9 @@ import Card2D from '@/img/playing-cards/2D.svg'
 import Card2H from '@/img/playing-cards/2H.svg'
 import Card2S from '@/img/playing-cards/2S.svg'
 import { PlayingCardsCanvas } from './playing-cards-canvas'
+import { createNewPlayingCardsContextValue, PlayingCardsContext } from './playing-cards-context'
 
-const cardStacks: PlayingCardStackData[] = [
+const initialCardStacks: PlayingCardStackData[] = [
     {
         stackId: 0,
         cards: [
@@ -17,21 +18,21 @@ const cardStacks: PlayingCardStackData[] = [
     }, {
         stackId: 1,
         cards: [
-            { parentStackId: 0, cardIndex: 0, descriptor: { suit: OSuit.Diamonds, rank: 1, cardImg: Card2D } }
+            { parentStackId: 1, cardIndex: 0, descriptor: { suit: OSuit.Diamonds, rank: 1, cardImg: Card2D } }
         ],
         hasDropTarget: true,
         position: { x: 180, y: 30 }
     }, {
         stackId: 2,
         cards: [
-            { parentStackId: 0, cardIndex: 0, descriptor: { suit: OSuit.Hearts, rank: 1, cardImg: Card2H } }
+            { parentStackId: 2, cardIndex: 0, descriptor: { suit: OSuit.Hearts, rank: 1, cardImg: Card2H } }
         ],
         hasDropTarget: true,
         position: { x: 330, y: 30 }
     }, {
         stackId: 3,
         cards: [
-            { parentStackId: 0, cardIndex: 0, descriptor: { suit: OSuit.Spades, rank: 1, cardImg: Card2S } }
+            { parentStackId: 3, cardIndex: 0, descriptor: { suit: OSuit.Spades, rank: 1, cardImg: Card2S } }
         ],
         hasDropTarget: true,
         position: { x: 480, y: 30 }
@@ -65,7 +66,9 @@ export function PlayingCards() {
             <div className='pb-3'>
                 The following is an exploration of drag-n-drop behavior while staying within React and not using any dnd libraries and not using the draggable property.
             </div>
-            <PlayingCardsCanvas cardStacks={cardStacks} />
+            <PlayingCardsContext value={createNewPlayingCardsContextValue(initialCardStacks)}>
+                <PlayingCardsCanvas />
+            </PlayingCardsContext>
         </div >
     )
 }
