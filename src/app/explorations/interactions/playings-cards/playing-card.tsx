@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type PointerEvent } from "react"
+import { useCallback, useState, type PointerEvent } from "react"
 import type { PlayingCanvasPosition, PlayingCardData } from "./types"
 import { usePlayingCardsDragManager } from "./playing-cards-context";
 
@@ -14,7 +14,7 @@ export function PlayingCard({ card, position }: PlayingCardProps) {
     });
     const { setActiveDrag } = usePlayingCardsDragManager()
 
-    const handlePointerCapture = useCallback((_e: PointerEvent) => {
+    const handlePointerDown = useCallback((_e: PointerEvent) => {
         setIsBeingDragged(true)
         setActiveDrag(card, handleDrag, handleEndDrag)
     }, [card])
@@ -35,9 +35,10 @@ export function PlayingCard({ card, position }: PlayingCardProps) {
             className="absolute h-36"
             style={{
                 transform: `translateX(${currentPosition.x}px) translateY(${currentPosition.y}px)`,
-                zIndex: isBeingDragged ? '100' : card.cardIndex
+                zIndex: isBeingDragged ? '100' : card.cardIndex,
+                pointerEvents: isBeingDragged ? 'none' : 'auto'
             }}
-            onPointerDown={handlePointerCapture}
+            onPointerDown={handlePointerDown}
             draggable={false}
         >
             <img src={card.descriptor.cardImg} className="h-full" />
