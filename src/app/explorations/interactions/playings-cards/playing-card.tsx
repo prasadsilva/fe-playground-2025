@@ -26,6 +26,8 @@ export function PlayingCard({ card, position, ...props }: PlayingCardProps) {
         setCurrentPosition(position)
     }, [position])
 
+    const { createCanvasPortal } = PlayingCardsHooks.useCanvas()
+
     return (
         <div
             {...props}
@@ -37,6 +39,7 @@ export function PlayingCard({ card, position, ...props }: PlayingCardProps) {
                 pointerEvents: isBeingDragged ? 'none' : 'auto'
             }}
         >
+            {createCanvasPortal(<div className="absolute">Bar Foo</div>)}
             <img src={card.descriptor.cardImg} className="h-full" />
         </div>
     )

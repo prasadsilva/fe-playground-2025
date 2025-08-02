@@ -1,23 +1,31 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type JSX } from "react"
 import type { PlayingCardData, PlayingCardStackData, PlayingCardStackInfo } from "./types"
 import type { Immutable } from "@/lib/types"
 import { deepFreeze } from "@/lib/utils"
 import { DragManager } from "./dragmanager"
+import { createPortal } from "react-dom"
 
 class PlayingCardsContextData {
     private cardStacks: Immutable<PlayingCardStackData[]>
     private changeListeners: Set<() => void>
     private dragManager: DragManager<PlayingCardData>
     private activeDropTarget: PlayingCardStackInfo | null
+    private canvasElement: HTMLElement | null
 
     public constructor(cardStacksParam: PlayingCardStackData[]) {
         this.cardStacks = deepFreeze(cardStacksParam)
         this.changeListeners = new Set
         this.dragManager = new DragManager((card) => this.tryHandleDrop(card))
         this.activeDropTarget = null
+        this.canvasElement = null
     }
 
-    // TODO: When cardStacks changes, fire off all changeListeners
+    public getCanvas() {
+        return this.canvasElement
+    }
+    public setCanvas(canvas: HTMLElement | null) {
+        this.canvasElement = canvas
+    }
 
     public getCardStacks() { return this.cardStacks }
 
@@ -166,6 +174,7 @@ function useDropTarget(stackInfo: Immutable<PlayingCardStackInfo>) {
         return activeDragCard && activeDragCard.stackInfo.stackId !== stackInfo.stackId
     }, [activeDragCard, stackInfo])
 
+    // TODO: Change to ref callback?
     useEffect(() => {
         const element = dropTargetRef.current
         if (element) {
@@ -209,6 +218,7 @@ function useDraggable(card: Immutable<PlayingCardData>, onDrag: (canvasDeltaX: n
     const [isBeingDragged, setIsBeingDragged] = useState(false)
     const { setActiveDrag } = PlayingCardsHooks.useDragManager()
 
+    // TODO: Change to ref callback?
     useEffect(() => {
         const element = draggableRef.current
         if (element) {
@@ -235,9 +245,37 @@ function useDraggable(card: Immutable<PlayingCardData>, onDrag: (canvasDeltaX: n
     }
 }
 
+function useCanvas() {
+    const playingCardsContext = useContext(PlayingCardsContext)
+    const [isCanvasAvailable, setIsCanvasAvailable] = useState(false)
+    const canvasRef = useCallback((node: HTMLDivElement | null) => {
+        if (playingCardsContext.getCanvas() && node) {
+            console.warn('Unable to register canvas element. A canvas is already registered.')
+            return
+        }
+        playingCardsContext.setCanvas(node)
+        setIsCanvasAvailable(node !== null)
+    }, [])
+
+    const createCanvasPortal = (node: JSX.Element) => {
+        const canvas = playingCardsContext.getCanvas()
+        if (canvas !== null) {
+            return createPortal(node, canvas)
+        }
+        return null
+    }
+
+    return {
+        canvasRef,
+        isCanvasAvailable,
+        createCanvasPortal
+    }
+}
+
 export const PlayingCardsHooks = {
     useModel,
     useDragManager,
     useDropTarget,
-    useDraggable
+    useDraggable,
+    useCanvas
 }

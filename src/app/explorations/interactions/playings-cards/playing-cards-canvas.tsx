@@ -5,10 +5,15 @@ import type { Immutable } from "@/lib/types"
 
 export type PlayingCardsCanvasProps = Immutable<{}> & ComponentProps<'div'>
 export function PlayingCardsCanvas({ }: PlayingCardsCanvasProps) {
+    const { canvasRef, isCanvasAvailable } = PlayingCardsHooks.useCanvas()
     const { cardStacks } = PlayingCardsHooks.useModel()
+
     return (
-        <div className="relative">
-            {cardStacks.map((cardStack) => <PlayingCardsStack key={`card-stack-${cardStack.stackId}`} cardStack={cardStack} />)}
+        <div ref={canvasRef} className="relative">
+            {
+                isCanvasAvailable &&
+                cardStacks.map((cardStack) => <PlayingCardsStack key={`card-stack-${cardStack.stackId}`} cardStack={cardStack} />)
+            }
         </div >
     )
 }
