@@ -1,56 +1,54 @@
-import { useCallback, useContext, useRef, useState } from "react";
-import type { PlayingCardData } from "./types";
-import { DraggingContext } from "./dragging-context";
+import { useCallback, useEffect, useState, type ComponentProps, type PointerEvent } from "react"
+import type { PlayingCanvasPosition, PlayingCardData } from "./types"
+import { usePlayingCardsDragManager } from "./playing-cards-context";
+import type { Immutable } from "@/lib/types";
 
-export interface PlayingCardProps {
-    name: string,
-    data: PlayingCardData,
-    initialCanvasPosition: {
-        x: number,
-        y: number
-    },
-}
-export function PlayingCard({ name, data, initialCanvasPosition }: PlayingCardProps) {
-    const objRef = useRef<HTMLDivElement>(null)
-    const draggingContext = useContext(DraggingContext)
-    const [translate, setTranslate] = useState({
-        x: initialCanvasPosition.x,
-        y: initialCanvasPosition.y
+export type PlayingCardProps = Immutable<{
+    card: PlayingCardData,
+    position: PlayingCanvasPosition
+}> & ComponentProps<'div'>
+export function PlayingCard({ card, position, ...props }: PlayingCardProps) {
+    const [isBeingDragged, setIsBeingDragged] = useState(false)
+    const [currentPosition, setCurrentPosition] = useState({
+        x: position.x,
+        y: position.y
     });
-    const [dragging, setDragging] = useState(false)
+    const { setActiveDrag } = usePlayingCardsDragManager()
 
-    // TODO: Maybe all of this logic can be done in a useEffect by passing the ref to the context?
-    //       dragginContext.registerDraggable(objRef)
-    const handlePointerCapture = useCallback((_e: React.PointerEvent) => {
-        if (!objRef || !objRef.current) return;
-        setDragging(true)
-        draggingContext.setDragHandler(handleDrag, handleEndDrag)
-    }, [objRef])
+    // Reset the internal position if param changes
+    useEffect(() => {
+        setCurrentPosition(position)
+    }, [position])
+
+    const handlePointerDown = useCallback((_e: PointerEvent) => {
+        setIsBeingDragged(true)
+        setActiveDrag(card, handleDrag, handleEndDrag)
+    }, [card])
 
     const handleDrag = useCallback((canvasDeltaX: number, canvasDeltaY: number) => {
-        setTranslate(prev => ({
+        setCurrentPosition(prev => ({
             x: prev.x + canvasDeltaX,
             y: prev.y + canvasDeltaY
         }))
     }, [])
 
     const handleEndDrag = useCallback(() => {
-        setDragging(false)
+        setIsBeingDragged(false)
     }, [])
 
     return (
         <div
-            id={name}
-            ref={objRef}
+            {...props}
             className="absolute h-36"
             style={{
-                transform: `translateX(${translate.x}px) translateY(${translate.y}px)`,
-                zIndex: dragging ? '100' : '10'
+                transform: `translateX(${currentPosition.x}px) translateY(${currentPosition.y}px)`,
+                zIndex: isBeingDragged ? '100' : card.stackInfo.cardIndex,
+                pointerEvents: isBeingDragged ? 'none' : 'auto'
             }}
-            onPointerDown={handlePointerCapture}
+            onPointerDown={handlePointerDown}
             draggable={false}
         >
-            <img src={data.cardImg} className="h-full" />
+            <img src={card.descriptor.cardImg} className="h-full" />
         </div>
     )
 }
