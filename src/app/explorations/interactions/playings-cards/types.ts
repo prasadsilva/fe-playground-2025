@@ -1,3 +1,5 @@
+// NOTE: This file cannot be .d.ts. We are exporting an object.
+
 // https://www.typescriptlang.org/docs/handbook/enums.html#objects-vs-enums
 export const OSuit = {
     Clubs: 0,

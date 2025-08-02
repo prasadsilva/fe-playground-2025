@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type ComponentProps, type PointerEvent } from "react"
 import type { PlayingCanvasPosition, PlayingCardData } from "./types"
-import { usePlayingCardsDragManager } from "./playing-cards-context";
+import { PlayingCardsHooks } from "./playing-cards-context";
 import type { Immutable } from "@/lib/types";
 
 export type PlayingCardProps = Immutable<{
@@ -13,7 +13,7 @@ export function PlayingCard({ card, position, ...props }: PlayingCardProps) {
         x: position.x,
         y: position.y
     });
-    const { setActiveDrag } = usePlayingCardsDragManager()
+    const { setActiveDrag } = PlayingCardsHooks.useDragManager()
 
     // Reset the internal position if param changes
     useEffect(() => {
