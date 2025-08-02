@@ -1,4 +1,4 @@
-import{r as z,j as w,f as D,u as Fe,B as le}from"./index-D_6JyRB_.js";import{f as se,u as $e,a as xe,S as Me}from"./format-B0D0eTIe.js";import"./ApolloContext-CqMZQLGT.js";/**
+import{r as z,j as w,g as D,u as Fe,B as le}from"./index-BEebxDYA.js";import{f as se,u as $e,a as xe,S as Me}from"./format-BHeRrlmm.js";import"./ApolloContext-BaIj2w0u.js";/**
    * table-core
    *
    * Copyright (c) TanStack
