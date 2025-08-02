@@ -22,14 +22,18 @@ export interface PlayingCanvasPosition {
     y: number
 }
 
+export interface PlayingCardStackInfo {
+    stackId: number,
+    cardIndex: number,
+}
+
 export interface PlayingCardDropTargetData {
-    parentStackId: number
+    stackInfo: PlayingCardStackInfo
 }
 
 export interface PlayingCardData {
-    parentStackId: number,
-    cardIndex: number,
-    descriptor: PlayingCardDescriptor
+    descriptor: PlayingCardDescriptor,
+    stackInfo: PlayingCardStackInfo
 }
 
 export interface PlayingCardStackData {

@@ -10,29 +10,29 @@ const initialCardStacks: PlayingCardStackData[] = [
     {
         stackId: 0,
         cards: [
-            { parentStackId: 0, cardIndex: 0, descriptor: { suit: OSuit.Clubs, rank: 1, cardImg: Card2C } },
-            { parentStackId: 0, cardIndex: 1, descriptor: { suit: OSuit.Diamonds, rank: 1, cardImg: Card2D } }
+            { stackInfo: { stackId: 0, cardIndex: 0 }, descriptor: { suit: OSuit.Clubs, rank: 1, cardImg: Card2C } },
+            { stackInfo: { stackId: 0, cardIndex: 1 }, descriptor: { suit: OSuit.Diamonds, rank: 1, cardImg: Card2D } }
         ],
         hasDropTarget: true,
         position: { x: 30, y: 30 }
     }, {
         stackId: 1,
         cards: [
-            { parentStackId: 1, cardIndex: 0, descriptor: { suit: OSuit.Diamonds, rank: 1, cardImg: Card2D } }
+            { stackInfo: { stackId: 1, cardIndex: 0 }, descriptor: { suit: OSuit.Diamonds, rank: 1, cardImg: Card2D } }
         ],
         hasDropTarget: true,
         position: { x: 180, y: 30 }
     }, {
         stackId: 2,
         cards: [
-            { parentStackId: 2, cardIndex: 0, descriptor: { suit: OSuit.Hearts, rank: 1, cardImg: Card2H } }
+            { stackInfo: { stackId: 2, cardIndex: 0 }, descriptor: { suit: OSuit.Hearts, rank: 1, cardImg: Card2H } }
         ],
         hasDropTarget: true,
         position: { x: 330, y: 30 }
     }, {
         stackId: 3,
         cards: [
-            { parentStackId: 3, cardIndex: 0, descriptor: { suit: OSuit.Spades, rank: 1, cardImg: Card2S } }
+            { stackInfo: { stackId: 3, cardIndex: 0 }, descriptor: { suit: OSuit.Spades, rank: 1, cardImg: Card2S } }
         ],
         hasDropTarget: true,
         position: { x: 480, y: 30 }

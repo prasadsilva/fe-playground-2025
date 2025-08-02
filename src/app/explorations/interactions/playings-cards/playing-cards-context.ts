@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react"
-import type { PlayingCardData, PlayingCardStackData } from "./types"
+import type { PlayingCardData, PlayingCardStackData, PlayingCardStackInfo } from "./types"
+import type { Immutable } from "@/lib/types"
+import { deepFreeze } from "@/lib/utils"
 
 class DragManager<T> {
     private trackedObjDragMoveCallback: ((canvasDeltaX: number, canvasDeltaY: number) => void) | undefined
@@ -9,8 +11,9 @@ class DragManager<T> {
     private usageCount: number
     private currentDragData: T | null
     private dragStateChangeListeners: Set<(dragCard: T | null) => void>
+    private dropCallback: (dragData: T) => void | null
 
-    public constructor() {
+    public constructor(dropCallback: typeof this.dropCallback) {
         this.trackedObjDragMoveCallback = undefined
         this.trackedObjDragEndCallback = undefined
         this.canvasPointerClientX = -1
@@ -18,6 +21,7 @@ class DragManager<T> {
         this.usageCount = 0
         this.currentDragData = null
         this.dragStateChangeListeners = new Set
+        this.dropCallback = dropCallback
     }
 
     private setDragData(dragData: T | null) {
@@ -52,17 +56,23 @@ class DragManager<T> {
 
     private registerPointerReleaseCallbacks = () => {
         document.body.addEventListener('pointerup', this.handlePointerReleaseNative)
-        document.body.addEventListener('pointerleave', this.handlePointerReleaseNative)
-        document.body.addEventListener('pointercancel', this.handlePointerReleaseNative)
+        document.body.addEventListener('pointerleave', this.handlePointerInvalidNative)
+        document.body.addEventListener('pointercancel', this.handlePointerInvalidNative)
     }
 
     private unregisterPointerReleaseCallbacks = () => {
         document.body.removeEventListener('pointerup', this.handlePointerReleaseNative)
-        document.body.removeEventListener('pointerleave', this.handlePointerReleaseNative)
-        document.body.removeEventListener('pointercancel', this.handlePointerReleaseNative)
+        document.body.removeEventListener('pointerleave', this.handlePointerInvalidNative)
+        document.body.removeEventListener('pointercancel', this.handlePointerInvalidNative)
     }
 
     private handlePointerReleaseNative = (_e: PointerEvent) => {
+        if (this.currentDragData) {
+            this.dropCallback(this.currentDragData)
+        }
+        this.clearActiveDragHandler()
+    }
+    private handlePointerInvalidNative = (_e: PointerEvent) => {
         this.clearActiveDragHandler()
     }
 
@@ -101,18 +111,19 @@ class DragManager<T> {
 
         this.setDragData(null)
     }
-
 }
 
 class PlayingCardsContextData {
-    private cardStacks: PlayingCardStackData[]
+    private cardStacks: Immutable<PlayingCardStackData[]>
     private changeListeners: Set<() => void>
     private dragManager: DragManager<PlayingCardData>
+    private activeDropTarget: PlayingCardStackInfo | null
 
     public constructor(cardStacksParam: PlayingCardStackData[]) {
-        this.cardStacks = [...cardStacksParam]
+        this.cardStacks = deepFreeze(cardStacksParam)
         this.changeListeners = new Set
-        this.dragManager = new DragManager
+        this.dragManager = new DragManager((card) => this.tryHandleDrop(card))
+        this.activeDropTarget = null
     }
 
     // TODO: When cardStacks changes, fire off all changeListeners
@@ -129,11 +140,75 @@ class PlayingCardsContextData {
         this.dragManager.removedragStateChangeListener(callback)
     }
 
+    public setActiveDropTarget(stackInfo: PlayingCardStackInfo) {
+        this.activeDropTarget = stackInfo
+    }
+    public clearActiveDropTarget() {
+        this.activeDropTarget = null
+    }
+    private tryHandleDrop(card: PlayingCardData) {
+        if (this.activeDropTarget) {
+            this.moveBetweenStacks(card.stackInfo, this.activeDropTarget)
+        } else {
+            // Force reset
+            this.fireModelChange()
+        }
+        this.clearActiveDropTarget()
+    }
+
     public addChangeListener(callback: () => void) {
         this.changeListeners.add(callback)
     }
     public removeChangeListener(callback: () => void) {
         this.changeListeners.delete(callback)
+    }
+    private fireModelChange() {
+        this.changeListeners.forEach(callback => callback())
+    }
+
+    private moveBetweenStacks(sourceStackInfo: PlayingCardStackInfo, targetStackInfo: PlayingCardStackInfo) {
+        const sourceStackIdx = this.cardStacks.findIndex(cardStack => cardStack.stackId === sourceStackInfo.stackId)
+        if (sourceStackIdx === -1) {
+            console.warn('Unable to move card. Source stack is invalid')
+            return
+        }
+        const targetStackIdx = this.cardStacks.findIndex(cardStack => cardStack.stackId === targetStackInfo.stackId)
+        if (targetStackIdx === -1) {
+            console.warn('Unable to move card. Target stack is invalid')
+            return
+        }
+
+        // Note: We need to perform a deep replication of the data for downstream components to detect the exact change
+        //       It would be better to use an immutable data library here
+
+        // Remove card from source stack
+        const cardStacksCopy = [...this.cardStacks]
+        const sourceStackCopy = { ...this.cardStacks[sourceStackIdx] }
+        const sourceStackCardsCopy = [...sourceStackCopy.cards]
+        const removed = sourceStackCardsCopy.splice(sourceStackInfo.cardIndex, 1)
+        if (removed.length !== 1) {
+            console.warn('Something went wrong with card removal')
+        }
+        // Fix the stack indices of cards after removal idx for consistency
+        for (let idx = sourceStackInfo.cardIndex; idx < sourceStackCardsCopy.length; idx++) {
+            const cardCopy = { ...sourceStackCardsCopy[idx] }
+            cardCopy.stackInfo = { stackId: sourceStackInfo.stackId, cardIndex: idx }
+            sourceStackCardsCopy[idx] = cardCopy
+        }
+        sourceStackCopy.cards = sourceStackCardsCopy
+        cardStacksCopy[sourceStackIdx] = sourceStackCopy
+
+        // Add card to target stack
+        const movingCard = { ...removed[0] }
+        movingCard.stackInfo = { ...targetStackInfo }
+        const targetStackCopy = { ...this.cardStacks[targetStackIdx] }
+        const targetStackCardsCopy = [...targetStackCopy.cards]
+        targetStackCardsCopy.splice(targetStackInfo.cardIndex, 0, movingCard)
+        targetStackCopy.cards = targetStackCardsCopy
+        cardStacksCopy[targetStackIdx] = targetStackCopy
+
+        this.cardStacks = cardStacksCopy
+        this.fireModelChange()
     }
 }
 
@@ -146,7 +221,7 @@ export function usePlayingCardsModel() {
     const [cardStacks, setCardStacks] = useState(playingCardsContext.getCardStacks())
 
     const handleContextChange = useCallback(() => {
-        setCardStacks(playingCardsContext.getCardStacks())
+        setCardStacks([...playingCardsContext.getCardStacks()])
     }, [playingCardsContext])
 
     useEffect(() => {
@@ -176,8 +251,17 @@ export function usePlayingCardsDragManager() {
         playingCardsContext.setActiveDragHandler(dragData, onDragMove, onDragEnd)
     }, [playingCardsContext])
 
+    const setActiveDrop = useCallback((stackInfo: PlayingCardStackInfo) => {
+        playingCardsContext.setActiveDropTarget(stackInfo)
+    }, [playingCardsContext])
+    const unsetActiveDrop = useCallback((_stackInfo: PlayingCardStackInfo) => {
+        playingCardsContext.clearActiveDropTarget()
+    }, [playingCardsContext])
+
     return {
         activeDragCard,
-        setActiveDrag
+        setActiveDrag,
+        setActiveDrop,
+        unsetActiveDrop
     }
 }

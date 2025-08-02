@@ -1,18 +1,24 @@
-import { useCallback, useState, type PointerEvent } from "react"
+import { useCallback, useEffect, useState, type ComponentProps, type PointerEvent } from "react"
 import type { PlayingCanvasPosition, PlayingCardData } from "./types"
 import { usePlayingCardsDragManager } from "./playing-cards-context";
+import type { Immutable } from "@/lib/types";
 
-export interface PlayingCardProps {
+export type PlayingCardProps = Immutable<{
     card: PlayingCardData,
     position: PlayingCanvasPosition
-}
-export function PlayingCard({ card, position }: PlayingCardProps) {
+}> & ComponentProps<'div'>
+export function PlayingCard({ card, position, ...props }: PlayingCardProps) {
     const [isBeingDragged, setIsBeingDragged] = useState(false)
     const [currentPosition, setCurrentPosition] = useState({
         x: position.x,
         y: position.y
     });
     const { setActiveDrag } = usePlayingCardsDragManager()
+
+    // Reset the internal position if param changes
+    useEffect(() => {
+        setCurrentPosition(position)
+    }, [position])
 
     const handlePointerDown = useCallback((_e: PointerEvent) => {
         setIsBeingDragged(true)
@@ -32,10 +38,11 @@ export function PlayingCard({ card, position }: PlayingCardProps) {
 
     return (
         <div
+            {...props}
             className="absolute h-36"
             style={{
                 transform: `translateX(${currentPosition.x}px) translateY(${currentPosition.y}px)`,
-                zIndex: isBeingDragged ? '100' : card.cardIndex,
+                zIndex: isBeingDragged ? '100' : card.stackInfo.cardIndex,
                 pointerEvents: isBeingDragged ? 'none' : 'auto'
             }}
             onPointerDown={handlePointerDown}
