@@ -1,4 +1,4 @@
-import { useEffect, type ComponentProps } from "react"
+import { type ComponentProps } from "react"
 import { PlayingCardsStack } from "./playing-cards-stack"
 import { usePlayingCardsModel } from "./playing-cards-context"
 import type { Immutable } from "@/lib/types"
