@@ -204,8 +204,40 @@ function useDropTarget(stackInfo: Immutable<PlayingCardStackInfo>) {
     }
 }
 
+function useDraggable(card: Immutable<PlayingCardData>, onDrag: (canvasDeltaX: number, canvasDeltaY: number) => void) {
+    const draggableRef = useRef<HTMLDivElement>(null)
+    const [isBeingDragged, setIsBeingDragged] = useState(false)
+    const { setActiveDrag } = PlayingCardsHooks.useDragManager()
+
+    useEffect(() => {
+        const element = draggableRef.current
+        if (element) {
+            element.draggable = false
+            const handlePointerDown = () => {
+                setIsBeingDragged(true)
+                setActiveDrag(card, onDrag, handleEndDrag)
+            }
+
+            element.addEventListener('pointerdown', handlePointerDown)
+            return () => {
+                element.removeEventListener('pointerdown', handlePointerDown)
+            }
+        }
+    }, [draggableRef.current, card, onDrag])
+
+    const handleEndDrag = useCallback(() => {
+        setIsBeingDragged(false)
+    }, [])
+
+    return {
+        draggableRef,
+        isBeingDragged
+    }
+}
+
 export const PlayingCardsHooks = {
     useModel,
     useDragManager,
-    useDropTarget
+    useDropTarget,
+    useDraggable
 }
