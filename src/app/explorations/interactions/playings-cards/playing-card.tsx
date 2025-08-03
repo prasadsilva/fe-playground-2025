@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ComponentProps } from "react"
-import type { PlayingCanvasPosition, PlayingCardStackData, PlayingCardStackInfo } from "./types"
+import { OPlayingCardStackBehavior, type PlayingCanvasPosition, type PlayingCardStackData, type PlayingCardStackInfo } from "./types"
 import { PlayingCardsHooks } from "./playing-cards-context";
 import type { Immutable } from "@/lib/types";
 import { PlayingCardDropTarget } from "./playing-card-drop-target";
@@ -37,7 +37,8 @@ export function PlayingCard({ cardStack, stackInfo, position, isPreviousSiblingB
     }, [position])
 
     const isInDraggedState = useMemo(() => isPreviousSiblingBeingDragged || isBeingDragged, [isPreviousSiblingBeingDragged, isBeingDragged])
-    const nextSiblingPosition = useMemo<PlayingCanvasPosition>(() => ({ x: currentPosition.x, y: currentPosition.y + STACKED_CARD_Y_OFFSET }), [currentPosition])
+    const positionForSiblingLayout = cardStack.behavior === OPlayingCardStackBehavior.MoveAllNextSiblings ? currentPosition : position
+    const nextSiblingPosition = useMemo<PlayingCanvasPosition>(() => ({ x: positionForSiblingLayout.x, y: positionForSiblingLayout.y + STACKED_CARD_Y_OFFSET }), [positionForSiblingLayout])
 
     return (
         <>

@@ -7,7 +7,7 @@ export const OSuit = {
     Hearts: 2,
     Spades: 3,
 } as const;
-export type Suit = typeof OSuit[keyof typeof OSuit];
+export type Suit = typeof OSuit[keyof typeof OSuit]
 // Usage:
 // function foo(param: Suit) { ... }
 // const someVar = {..., enumValue: OSuit, ... }
@@ -29,8 +29,18 @@ export interface PlayingCardStackInfo {
     cardIndex: number,
 }
 
+export const OPlayingCardStackBehavior = {
+    MoveIndividually: 0,
+    MoveAllNextSiblings: 1
+} as const;
+export type PlayingCardStackBehavior = typeof OPlayingCardStackBehavior[keyof typeof OPlayingCardStackBehavior]
+// Usage:
+// function foo(param: StackBehavior) { ... }
+// const someVar = {..., enumValue: OStackBehavior, ... }
+
 export interface PlayingCardStackData {
     cards: PlayingCardDescriptor[],
+    behavior: PlayingCardStackBehavior,
     hasDropTarget: boolean,
     position: PlayingCanvasPosition
 }

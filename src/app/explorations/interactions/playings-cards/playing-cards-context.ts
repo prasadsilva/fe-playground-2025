@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type JSX } from "react"
-import type { PlayingCardStackData, PlayingCardStackInfo } from "./types"
+import { OPlayingCardStackBehavior, type PlayingCardStackData, type PlayingCardStackInfo } from "./types"
 import type { Immutable } from "@/lib/types"
 import { deepFreeze } from "@/lib/utils"
 import { DragManager } from "./dragmanager"
@@ -83,22 +83,49 @@ class PlayingCardsContextData {
         //       It would be better to use an immutable data library here
         const cardStacksCopy = [...this.cardStacks]
 
-        // Remove card and siblings below from source stack
-        const sourceStackCopy = { ...this.cardStacks[sourceStackIdx] }
-        const sourceStackCardsCopy = sourceStackCopy.cards.slice(0, sourceStackInfo.cardIndex)
-        const cardsToMove = sourceStackCopy.cards.slice(sourceStackInfo.cardIndex)
-        if (sourceStackCardsCopy.length === sourceStackCopy.cards.length) {
-            console.warn('Something went wrong with card removal')
-        }
-        sourceStackCopy.cards = sourceStackCardsCopy
-        cardStacksCopy[sourceStackIdx] = sourceStackCopy
+        switch (this.cardStacks[sourceStackInfo.stackIndex].behavior) {
+            case OPlayingCardStackBehavior.MoveAllNextSiblings: {
+                // Remove card and next siblings below from source stack
+                const sourceStackCopy = { ...this.cardStacks[sourceStackIdx] }
+                const sourceStackCardsCopy = sourceStackCopy.cards.slice(0, sourceStackInfo.cardIndex)
+                const cardsToMove = sourceStackCopy.cards.slice(sourceStackInfo.cardIndex)
+                if (sourceStackCardsCopy.length === sourceStackCopy.cards.length) {
+                    console.warn('Something went wrong with card removal')
+                }
+                sourceStackCopy.cards = sourceStackCardsCopy
+                cardStacksCopy[sourceStackIdx] = sourceStackCopy
 
-        // Add card to target stack
-        const targetStackCopy = { ...this.cardStacks[targetStackIdx] }
-        const targetStackCardsCopy = [...targetStackCopy.cards]
-        targetStackCardsCopy.splice(targetStackInfo.cardIndex, 0, ...cardsToMove)
-        targetStackCopy.cards = targetStackCardsCopy
-        cardStacksCopy[targetStackIdx] = targetStackCopy
+                // Add card and next siblings to target stack
+                const targetStackCopy = { ...this.cardStacks[targetStackIdx] }
+                const targetStackCardsCopy = [...targetStackCopy.cards]
+                targetStackCardsCopy.splice(targetStackInfo.cardIndex, 0, ...cardsToMove)
+                targetStackCopy.cards = targetStackCardsCopy
+                cardStacksCopy[targetStackIdx] = targetStackCopy
+
+                break
+            }
+            case OPlayingCardStackBehavior.MoveIndividually: {
+                // Remove only the one card from source stack
+                const sourceStackCopy = { ...this.cardStacks[sourceStackIdx] }
+                const sourceStackCardsCopy = [...sourceStackCopy.cards]
+                const cardsToMove = sourceStackCardsCopy.splice(sourceStackInfo.cardIndex, 1)
+                if (sourceStackCardsCopy.length === sourceStackCopy.cards.length) {
+                    console.warn('Something went wrong with card removal')
+                }
+                sourceStackCopy.cards = sourceStackCardsCopy
+                cardStacksCopy[sourceStackIdx] = sourceStackCopy
+
+                // Add the one card to the target stack
+                const targetStackCopy = { ...this.cardStacks[targetStackIdx] }
+                const targetStackCardsCopy = [...targetStackCopy.cards]
+                targetStackCardsCopy.splice(targetStackInfo.cardIndex, 0, ...cardsToMove)
+                targetStackCopy.cards = targetStackCardsCopy
+                cardStacksCopy[targetStackIdx] = targetStackCopy
+
+                break
+            }
+        }
+
 
         this.cardStacks = cardStacksCopy
     }
