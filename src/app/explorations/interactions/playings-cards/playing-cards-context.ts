@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type JSX } from "react"
-import type { PlayingCardData, PlayingCardStackData, PlayingCardStackInfo } from "./types"
+import type { PlayingCardStackData, PlayingCardStackInfo } from "./types"
 import type { Immutable } from "@/lib/types"
 import { deepFreeze } from "@/lib/utils"
 import { DragManager } from "./dragmanager"
@@ -10,7 +10,7 @@ type PlayingCardsContextChangeListener = (modelChanged: boolean) => void
 class PlayingCardsContextData {
     private cardStacks: Immutable<PlayingCardStackData[]>
     private changeListeners: Set<PlayingCardsContextChangeListener>
-    private dragManager: DragManager<PlayingCardData>
+    private dragManager: DragManager<PlayingCardStackInfo>
     private activeDropTarget: PlayingCardStackInfo | null
     private canvasElement: HTMLElement | null
 
@@ -31,13 +31,13 @@ class PlayingCardsContextData {
 
     public getCardStacks() { return this.cardStacks }
 
-    public setActiveDragHandler(dragData: PlayingCardData, onDragMove: ((canvasDeltaX: number, canvasDeltaY: number) => void), onDragEnd: (() => void)) {
+    public setActiveDragHandler(dragData: PlayingCardStackInfo, onDragMove: ((canvasDeltaX: number, canvasDeltaY: number) => void), onDragEnd: (() => void)) {
         this.dragManager.setActiveDragHandler(dragData, onDragMove, onDragEnd)
     }
-    public addDragStateChangeListener(callback: (dragCard: PlayingCardData | null) => void) {
+    public addDragStateChangeListener(callback: (stackInfo: PlayingCardStackInfo | null) => void) {
         this.dragManager.addDragStateChangeListener(callback)
     }
-    public removeDragStateChangeListener(callback: (dragCard: PlayingCardData | null) => void) {
+    public removeDragStateChangeListener(callback: (stackInfo: PlayingCardStackInfo | null) => void) {
         this.dragManager.removedragStateChangeListener(callback)
     }
 
@@ -47,9 +47,9 @@ class PlayingCardsContextData {
     public clearActiveDropTarget() {
         this.activeDropTarget = null
     }
-    private tryHandleDrop(card: PlayingCardData) {
+    private tryHandleDrop(stackInfo: PlayingCardStackInfo) {
         if (this.activeDropTarget) {
-            this.moveBetweenStacks(card.stackInfo, this.activeDropTarget)
+            this.moveBetweenStacks(stackInfo, this.activeDropTarget)
             this.notifyContextStateChange(true)
         } else {
             this.notifyContextStateChange(false)
@@ -68,12 +68,12 @@ class PlayingCardsContextData {
     }
 
     private moveBetweenStacks(sourceStackInfo: PlayingCardStackInfo, targetStackInfo: PlayingCardStackInfo) {
-        const sourceStackIdx = this.cardStacks.findIndex(cardStack => cardStack.stackId === sourceStackInfo.stackId)
+        const sourceStackIdx = sourceStackInfo.stackIndex
         if (sourceStackIdx === -1) {
             console.warn('Unable to move card. Source stack is invalid')
             return
         }
-        const targetStackIdx = this.cardStacks.findIndex(cardStack => cardStack.stackId === targetStackInfo.stackId)
+        const targetStackIdx = targetStackInfo.stackIndex
         if (targetStackIdx === -1) {
             console.warn('Unable to move card. Target stack is invalid')
             return
@@ -97,11 +97,6 @@ class PlayingCardsContextData {
         const targetStackCopy = { ...this.cardStacks[targetStackIdx] }
         const targetStackCardsCopy = [...targetStackCopy.cards]
         targetStackCardsCopy.splice(targetStackInfo.cardIndex, 0, ...cardsToMove)
-        for (let idx = 0; idx < targetStackCardsCopy.length; idx++) {
-            const cardCopy = { ...targetStackCardsCopy[idx] }
-            cardCopy.stackInfo = { stackId: targetStackInfo.stackId, cardIndex: idx }
-            targetStackCardsCopy[idx] = cardCopy
-        }
         targetStackCopy.cards = targetStackCardsCopy
         cardStacksCopy[targetStackIdx] = targetStackCopy
 
@@ -138,10 +133,10 @@ function useModel() {
 
 function useDragManager() {
     const playingCardsContext = useContext(PlayingCardsContext)
-    const [activeDragCard, setActiveDragCard] = useState<PlayingCardData | null>(null)
+    const [activeDragInfo, setActiveDragInfo] = useState<PlayingCardStackInfo | null>(null)
 
-    const handleActiveDragChange = useCallback((dragCard: PlayingCardData | null) => {
-        setActiveDragCard(dragCard)
+    const handleActiveDragChange = useCallback((stackInfo: PlayingCardStackInfo | null) => {
+        setActiveDragInfo(stackInfo)
     }, [])
 
     useEffect(() => {
@@ -149,8 +144,8 @@ function useDragManager() {
         return () => playingCardsContext.removeDragStateChangeListener(handleActiveDragChange)
     }, [playingCardsContext])
 
-    const setActiveDrag = useCallback((dragData: PlayingCardData, onDragMove: ((canvasDeltaX: number, canvasDeltaY: number) => void), onDragEnd: (() => void)) => {
-        playingCardsContext.setActiveDragHandler(dragData, onDragMove, onDragEnd)
+    const setActiveDrag = useCallback((stackInfo: PlayingCardStackInfo, onDragMove: ((canvasDeltaX: number, canvasDeltaY: number) => void), onDragEnd: (() => void)) => {
+        playingCardsContext.setActiveDragHandler(stackInfo, onDragMove, onDragEnd)
     }, [playingCardsContext])
 
     const setActiveDrop = useCallback((stackInfo: PlayingCardStackInfo) => {
@@ -161,7 +156,7 @@ function useDragManager() {
     }, [playingCardsContext])
 
     return {
-        activeDragCard,
+        activeDragInfo,
         setActiveDrag,
         setActiveDrop,
         unsetActiveDrop
@@ -170,12 +165,12 @@ function useDragManager() {
 
 function useDropTarget(stackInfo: Immutable<PlayingCardStackInfo>) {
     const dropTargetRef = useRef<HTMLDivElement>(null)
-    const { activeDragCard, setActiveDrop, unsetActiveDrop } = useDragManager()
+    const { activeDragInfo, setActiveDrop, unsetActiveDrop } = useDragManager()
     const [isDragCardOver, setIsDragCardOver] = useState(false)
 
     const isActivated = useMemo(() => {
-        return activeDragCard && activeDragCard.stackInfo.stackId !== stackInfo.stackId
-    }, [activeDragCard, stackInfo])
+        return activeDragInfo && activeDragInfo.stackIndex !== stackInfo.stackIndex
+    }, [activeDragInfo, stackInfo])
 
     // TODO: Change to ref callback?
     useEffect(() => {
@@ -204,10 +199,10 @@ function useDropTarget(stackInfo: Immutable<PlayingCardStackInfo>) {
     }, [dropTargetRef.current, isActivated, stackInfo])
 
     useEffect(() => {
-        if (!activeDragCard) {
+        if (!activeDragInfo) {
             setIsDragCardOver(false)
         }
-    }, [activeDragCard])
+    }, [activeDragInfo])
 
     return {
         dropTargetRef,
@@ -216,12 +211,15 @@ function useDropTarget(stackInfo: Immutable<PlayingCardStackInfo>) {
     }
 }
 
-function useDraggable(card: Immutable<PlayingCardData>, onDrag: (canvasDeltaX: number, canvasDeltaY: number) => void, onDragEnd: () => void) {
+function useDraggable(stackInfo: Immutable<PlayingCardStackInfo>, onDrag: (canvasDeltaX: number, canvasDeltaY: number) => void, onDragEnd: () => void) {
+    const { setActiveDrag } = PlayingCardsHooks.useDragManager()
+    const [isBeingDragged, setIsBeingDragged] = useState(false)
+
     const draggableRef = useCallback((node: HTMLDivElement | null) => {
         if (node) {
             const handlePointerDown = () => {
                 setIsBeingDragged(true)
-                setActiveDrag(card, onDrag, handleEndDrag)
+                setActiveDrag(stackInfo, onDrag, handleEndDrag)
             }
 
             node.addEventListener('pointerdown', handlePointerDown)
@@ -230,9 +228,6 @@ function useDraggable(card: Immutable<PlayingCardData>, onDrag: (canvasDeltaX: n
             }
         }
     }, [])
-
-    const [isBeingDragged, setIsBeingDragged] = useState(false)
-    const { setActiveDrag } = PlayingCardsHooks.useDragManager()
 
     const handleEndDrag = useCallback(() => {
         setIsBeingDragged(false)

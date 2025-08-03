@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ComponentProps } from "react"
-import type { PlayingCanvasPosition, PlayingCardStackData } from "./types"
+import type { PlayingCanvasPosition, PlayingCardStackData, PlayingCardStackInfo } from "./types"
 import { PlayingCardsHooks } from "./playing-cards-context";
 import type { Immutable } from "@/lib/types";
 import { PlayingCardDropTarget } from "./playing-card-drop-target";
@@ -8,11 +8,11 @@ const STACKED_CARD_Y_OFFSET = 24 // px
 
 export type PlayingCardProps = Immutable<{
     cardStack: PlayingCardStackData,
-    cardIdx: number,
+    stackInfo: PlayingCardStackInfo,
     position: PlayingCanvasPosition,
     isPreviousSiblingBeingDragged?: boolean
 }> & ComponentProps<'div'>
-export function PlayingCard({ cardStack, cardIdx, position, isPreviousSiblingBeingDragged, ...props }: PlayingCardProps) {
+export function PlayingCard({ cardStack, stackInfo, position, isPreviousSiblingBeingDragged, ...props }: PlayingCardProps) {
     // Track internal position separtely to allow for uncontrolled positioning while being dragged
     const [currentPosition, setCurrentPosition] = useState({
         x: position.x,
@@ -29,7 +29,7 @@ export function PlayingCard({ cardStack, cardIdx, position, isPreviousSiblingBei
         }))
     }, [])
 
-    const { draggableRef, isBeingDragged } = PlayingCardsHooks.useDraggable(cardStack.cards[cardIdx], handleDrag, resetInternalPosition)
+    const { draggableRef, isBeingDragged } = PlayingCardsHooks.useDraggable(stackInfo, handleDrag, resetInternalPosition)
 
     // Reset the internal position if param changes
     useEffect(() => {
@@ -47,15 +47,15 @@ export function PlayingCard({ cardStack, cardIdx, position, isPreviousSiblingBei
                 className="absolute h-36"
                 style={{
                     transform: `translateX(${currentPosition.x}px) translateY(${currentPosition.y}px)`,
-                    zIndex: isInDraggedState ? cardIdx + 100 : cardIdx,
+                    zIndex: isInDraggedState ? stackInfo.cardIndex + 100 : stackInfo.cardIndex,
                     pointerEvents: isInDraggedState ? 'none' : 'auto'
                 }}
             >
-                <img src={cardStack.cards[cardIdx].descriptor.cardImg} className="h-full" draggable={false} />
+                <img src={cardStack.cards[stackInfo.cardIndex].cardImg} className="h-full" draggable={false} />
             </div>
             <PlayingCardHolder
                 cardStack={cardStack}
-                cardIdx={cardIdx + 1}
+                stackInfo={{ ...stackInfo, cardIndex: stackInfo.cardIndex + 1 }}
                 position={nextSiblingPosition}
                 isPreviousSiblingBeingDragged={isInDraggedState}
             />
@@ -63,13 +63,13 @@ export function PlayingCard({ cardStack, cardIdx, position, isPreviousSiblingBei
     )
 }
 
-export function PlayingCardHolder({ cardStack, cardIdx, position, isPreviousSiblingBeingDragged, ...props }: PlayingCardProps) {
+export function PlayingCardHolder({ cardStack, stackInfo, position, isPreviousSiblingBeingDragged, ...props }: PlayingCardProps) {
     return (
-        cardIdx < cardStack.cards.length ?
-            <PlayingCard {...props} cardStack={cardStack} cardIdx={cardIdx} position={position} isPreviousSiblingBeingDragged={isPreviousSiblingBeingDragged} /> :
+        stackInfo.cardIndex < cardStack.cards.length ?
+            <PlayingCard {...props} cardStack={cardStack} stackInfo={stackInfo} position={position} isPreviousSiblingBeingDragged={isPreviousSiblingBeingDragged} /> :
             (cardStack.hasDropTarget &&
                 <PlayingCardDropTarget
-                    stackInfo={{ stackId: cardStack.stackId, cardIndex: cardStack.cards.length }}
+                    stackInfo={{ ...stackInfo, cardIndex: cardStack.cards.length }}
                     position={{ x: cardStack.position.x, y: cardStack.position.y + (cardStack.cards.length * STACKED_CARD_Y_OFFSET) }}
                 />)
     )

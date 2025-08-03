@@ -12,7 +12,7 @@ export function PlayingCardsCanvas({ }: PlayingCardsCanvasProps) {
         <div ref={canvasRef} className="relative">
             {
                 isCanvasAvailable &&
-                cardStacks.map((cardStack) => <PlayingCardsStack key={`card-stack-${cardStack.stackId}`} cardStack={cardStack} />)
+                cardStacks.map((cardStack, idx) => <PlayingCardsStack key={`card-stack-${idx}`} cardStack={cardStack} stackIndex={idx} />)
             }
         </div >
     )

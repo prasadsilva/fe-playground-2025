@@ -25,22 +25,12 @@ export interface PlayingCanvasPosition {
 }
 
 export interface PlayingCardStackInfo {
-    stackId: number,
+    stackIndex: number,
     cardIndex: number,
 }
 
-export interface PlayingCardDropTargetData {
-    stackInfo: PlayingCardStackInfo
-}
-
-export interface PlayingCardData {
-    descriptor: PlayingCardDescriptor,
-    stackInfo: PlayingCardStackInfo
-}
-
 export interface PlayingCardStackData {
-    stackId: number,
-    cards: PlayingCardData[],
+    cards: PlayingCardDescriptor[],
     hasDropTarget: boolean,
     position: PlayingCanvasPosition
 }

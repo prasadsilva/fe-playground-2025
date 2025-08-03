@@ -5,9 +5,10 @@ import CardOutline from '@/img/playing-cards/outline.svg'
 import type { Immutable } from "@/lib/types"
 
 export type PlayingCardsStackProps = Immutable<{
-    cardStack: PlayingCardStackData
+    cardStack: PlayingCardStackData,
+    stackIndex: number
 }> & ComponentProps<'div'>
-export function PlayingCardsStack({ cardStack, ...props }: PlayingCardsStackProps) {
+export function PlayingCardsStack({ cardStack, stackIndex, ...props }: PlayingCardsStackProps) {
     return (
         <>
             <div
@@ -23,7 +24,7 @@ export function PlayingCardsStack({ cardStack, ...props }: PlayingCardsStackProp
             </div>
             <PlayingCardHolder
                 cardStack={cardStack}
-                cardIdx={0}
+                stackInfo={{ stackIndex, cardIndex: 0 }}
                 position={cardStack.position}
             />
         </>
