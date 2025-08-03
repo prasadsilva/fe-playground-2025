@@ -79,35 +79,31 @@ class PlayingCardsContextData {
 
         // Note: We need to perform a deep replication of the data for downstream components to detect the exact change
         //       It would be better to use an immutable data library here
-
-        // Remove card from source stack
         const cardStacksCopy = [...this.cardStacks]
+
+        // Remove card and siblings below from source stack
         const sourceStackCopy = { ...this.cardStacks[sourceStackIdx] }
-        const sourceStackCardsCopy = [...sourceStackCopy.cards]
-        const removed = sourceStackCardsCopy.splice(sourceStackInfo.cardIndex, 1)
-        if (removed.length !== 1) {
+        const sourceStackCardsCopy = sourceStackCopy.cards.slice(0, sourceStackInfo.cardIndex)
+        const cardsToMove = sourceStackCopy.cards.slice(sourceStackInfo.cardIndex)
+        if (sourceStackCardsCopy.length === sourceStackCopy.cards.length) {
             console.warn('Something went wrong with card removal')
-        }
-        // Fix the stack indices of cards after removal idx for consistency
-        for (let idx = sourceStackInfo.cardIndex; idx < sourceStackCardsCopy.length; idx++) {
-            const cardCopy = { ...sourceStackCardsCopy[idx] }
-            cardCopy.stackInfo = { stackId: sourceStackInfo.stackId, cardIndex: idx }
-            sourceStackCardsCopy[idx] = cardCopy
         }
         sourceStackCopy.cards = sourceStackCardsCopy
         cardStacksCopy[sourceStackIdx] = sourceStackCopy
 
         // Add card to target stack
-        const movingCard = { ...removed[0] }
-        movingCard.stackInfo = { ...targetStackInfo }
         const targetStackCopy = { ...this.cardStacks[targetStackIdx] }
         const targetStackCardsCopy = [...targetStackCopy.cards]
-        targetStackCardsCopy.splice(targetStackInfo.cardIndex, 0, movingCard)
+        targetStackCardsCopy.splice(targetStackInfo.cardIndex, 0, ...cardsToMove)
+        for (let idx = 0; idx < targetStackCardsCopy.length; idx++) {
+            const cardCopy = { ...targetStackCardsCopy[idx] }
+            cardCopy.stackInfo = { stackId: targetStackInfo.stackId, cardIndex: idx }
+            targetStackCardsCopy[idx] = cardCopy
+        }
         targetStackCopy.cards = targetStackCardsCopy
         cardStacksCopy[targetStackIdx] = targetStackCopy
 
         this.cardStacks = cardStacksCopy
-        this.fireModelChange()
     }
 }
 
