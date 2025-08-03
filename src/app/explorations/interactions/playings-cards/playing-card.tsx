@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ComponentProps } from "react"
+import { useMemo, type ComponentProps } from "react"
 import { OPlayingCardStackBehavior, type PlayingCanvasPosition, type PlayingCardStackData, type PlayingCardStackInfo } from "./types"
 import { PlayingCardsHooks } from "./playing-cards-context";
 import type { Immutable } from "@/lib/types";
@@ -13,32 +13,18 @@ export type PlayingCardProps = Immutable<{
     isPreviousSiblingBeingDragged?: boolean
 }> & ComponentProps<'div'>
 export function PlayingCard({ cardStack, stackInfo, position, isPreviousSiblingBeingDragged, ...props }: PlayingCardProps) {
-    // Track internal position separtely to allow for uncontrolled positioning while being dragged
-    const [currentPosition, setCurrentPosition] = useState({
-        x: position.x,
-        y: position.y
-    });
+    const { draggableRef, isBeingDragged, currentPosition } = PlayingCardsHooks.useDraggable(stackInfo, position)
 
-    const resetInternalPosition = useCallback(() => {
-        setCurrentPosition(position)
-    }, [position])
-    const handleDrag = useCallback((canvasDeltaX: number, canvasDeltaY: number) => {
-        setCurrentPosition(prev => ({
-            x: prev.x + canvasDeltaX,
-            y: prev.y + canvasDeltaY
-        }))
-    }, [])
-
-    const { draggableRef, isBeingDragged } = PlayingCardsHooks.useDraggable(stackInfo, handleDrag, resetInternalPosition)
-
-    // Reset the internal position if param changes
-    useEffect(() => {
-        resetInternalPosition()
-    }, [position])
-
-    const isInDraggedState = useMemo(() => isPreviousSiblingBeingDragged || isBeingDragged, [isPreviousSiblingBeingDragged, isBeingDragged])
+    // TODO: These could be moved into the hook?
+    const isInDraggedState = useMemo(() =>
+        (cardStack.behavior === OPlayingCardStackBehavior.MoveAllNextSiblings && isPreviousSiblingBeingDragged) || isBeingDragged,
+        [isPreviousSiblingBeingDragged, isBeingDragged]
+    )
     const positionForSiblingLayout = cardStack.behavior === OPlayingCardStackBehavior.MoveAllNextSiblings ? currentPosition : position
-    const nextSiblingPosition = useMemo<PlayingCanvasPosition>(() => ({ x: positionForSiblingLayout.x, y: positionForSiblingLayout.y + STACKED_CARD_Y_OFFSET }), [positionForSiblingLayout])
+    const nextSiblingPosition = useMemo<PlayingCanvasPosition>(() =>
+        ({ x: positionForSiblingLayout.x, y: positionForSiblingLayout.y + STACKED_CARD_Y_OFFSET }),
+        [positionForSiblingLayout]
+    )
 
     return (
         <>

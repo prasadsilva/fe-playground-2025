@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type JSX } from "react"
-import { OPlayingCardStackBehavior, type PlayingCardStackData, type PlayingCardStackInfo } from "./types"
+import { OPlayingCardStackBehavior, type PlayingCanvasPosition, type PlayingCardStackData, type PlayingCardStackInfo } from "./types"
 import type { Immutable } from "@/lib/types"
 import { deepFreeze } from "@/lib/utils"
 import { DragManager } from "./dragmanager"
@@ -238,15 +238,35 @@ function useDropTarget(stackInfo: Immutable<PlayingCardStackInfo>) {
     }
 }
 
-function useDraggable(stackInfo: Immutable<PlayingCardStackInfo>, onDrag: (canvasDeltaX: number, canvasDeltaY: number) => void, onDragEnd: () => void) {
+function useDraggable(stackInfo: Immutable<PlayingCardStackInfo>, position: PlayingCanvasPosition) {
     const { setActiveDrag } = PlayingCardsHooks.useDragManager()
+
+    // Track internal position separtely to allow for uncontrolled positioning while being dragged
+    const [currentPosition, setCurrentPosition] = useState({
+        x: position.x,
+        y: position.y
+    });
+    const resetInternalPosition = useCallback(() => {
+        setCurrentPosition(position)
+    }, [position])
+    const handleDrag = useCallback((canvasDeltaX: number, canvasDeltaY: number) => {
+        setCurrentPosition(prev => ({
+            x: prev.x + canvasDeltaX,
+            y: prev.y + canvasDeltaY
+        }))
+    }, [])
+    const handleEndDrag = useCallback(() => {
+        setIsBeingDragged(false)
+        resetInternalPosition()
+    }, [resetInternalPosition])
+
     const [isBeingDragged, setIsBeingDragged] = useState(false)
 
     const draggableRef = useCallback((node: HTMLDivElement | null) => {
         if (node) {
             const handlePointerDown = () => {
                 setIsBeingDragged(true)
-                setActiveDrag(stackInfo, onDrag, handleEndDrag)
+                setActiveDrag(stackInfo, handleDrag, handleEndDrag)
             }
 
             node.addEventListener('pointerdown', handlePointerDown)
@@ -256,14 +276,15 @@ function useDraggable(stackInfo: Immutable<PlayingCardStackInfo>, onDrag: (canva
         }
     }, [])
 
-    const handleEndDrag = useCallback(() => {
-        setIsBeingDragged(false)
-        onDragEnd()
-    }, [onDragEnd])
+    // Reset the internal position if param changes
+    useEffect(() => {
+        resetInternalPosition()
+    }, [position])
 
     return {
         draggableRef,
-        isBeingDragged
+        isBeingDragged,
+        currentPosition
     }
 }
 
