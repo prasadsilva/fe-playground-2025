@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState, type ComponentProps } from "react"
-import type { PlayingCanvasPosition, PlayingCardData, PlayingCardStackData } from "./types"
+import { useCallback, useEffect, useMemo, useState, type ComponentProps } from "react"
+import type { PlayingCanvasPosition, PlayingCardStackData } from "./types"
 import { PlayingCardsHooks } from "./playing-cards-context";
 import type { Immutable } from "@/lib/types";
 import { PlayingCardDropTarget } from "./playing-card-drop-target";
@@ -18,20 +18,26 @@ export function PlayingCard({ cardStack, cardIdx, position, isPreviousSiblingBei
         x: position.x,
         y: position.y
     });
+
+    const resetInternalPosition = useCallback(() => {
+        setCurrentPosition(position)
+    }, [position])
     const handleDrag = useCallback((canvasDeltaX: number, canvasDeltaY: number) => {
         setCurrentPosition(prev => ({
             x: prev.x + canvasDeltaX,
             y: prev.y + canvasDeltaY
         }))
     }, [])
-    const { draggableRef, isBeingDragged } = PlayingCardsHooks.useDraggable(cardStack.cards[cardIdx], handleDrag)
+
+    const { draggableRef, isBeingDragged } = PlayingCardsHooks.useDraggable(cardStack.cards[cardIdx], handleDrag, resetInternalPosition)
 
     // Reset the internal position if param changes
     useEffect(() => {
-        setCurrentPosition(position)
+        resetInternalPosition()
     }, [position])
 
-    const isInDraggedState = isPreviousSiblingBeingDragged || isBeingDragged
+    const isInDraggedState = useMemo(() => isPreviousSiblingBeingDragged || isBeingDragged, [isPreviousSiblingBeingDragged, isBeingDragged])
+    const nextSiblingPosition = useMemo<PlayingCanvasPosition>(() => ({ x: currentPosition.x, y: currentPosition.y + STACKED_CARD_Y_OFFSET }), [currentPosition])
 
     return (
         <>
@@ -45,13 +51,13 @@ export function PlayingCard({ cardStack, cardIdx, position, isPreviousSiblingBei
                     pointerEvents: isInDraggedState ? 'none' : 'auto'
                 }}
             >
-                <img src={cardStack.cards[cardIdx].descriptor.cardImg} className="h-full" />
+                <img src={cardStack.cards[cardIdx].descriptor.cardImg} className="h-full" draggable={false} />
             </div>
             <PlayingCardHolder
                 cardStack={cardStack}
                 cardIdx={cardIdx + 1}
-                position={{ x: currentPosition.x, y: currentPosition.y + STACKED_CARD_Y_OFFSET }}
-                isPreviousSiblingBeingDragged={isPreviousSiblingBeingDragged}
+                position={nextSiblingPosition}
+                isPreviousSiblingBeingDragged={isInDraggedState}
             />
         </>
     )

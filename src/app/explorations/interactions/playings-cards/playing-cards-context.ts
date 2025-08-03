@@ -5,9 +5,11 @@ import { deepFreeze } from "@/lib/utils"
 import { DragManager } from "./dragmanager"
 import { createPortal } from "react-dom"
 
+type PlayingCardsContextChangeListener = (modelChanged: boolean) => void
+
 class PlayingCardsContextData {
     private cardStacks: Immutable<PlayingCardStackData[]>
-    private changeListeners: Set<() => void>
+    private changeListeners: Set<PlayingCardsContextChangeListener>
     private dragManager: DragManager<PlayingCardData>
     private activeDropTarget: PlayingCardStackInfo | null
     private canvasElement: HTMLElement | null
@@ -48,21 +50,21 @@ class PlayingCardsContextData {
     private tryHandleDrop(card: PlayingCardData) {
         if (this.activeDropTarget) {
             this.moveBetweenStacks(card.stackInfo, this.activeDropTarget)
+            this.notifyContextStateChange(true)
         } else {
-            // Force reset
-            this.fireModelChange()
+            this.notifyContextStateChange(false)
         }
         this.clearActiveDropTarget()
     }
 
-    public addChangeListener(callback: () => void) {
+    public addChangeListener(callback: PlayingCardsContextChangeListener) {
         this.changeListeners.add(callback)
     }
-    public removeChangeListener(callback: () => void) {
+    public removeChangeListener(callback: PlayingCardsContextChangeListener) {
         this.changeListeners.delete(callback)
     }
-    private fireModelChange() {
-        this.changeListeners.forEach(callback => callback())
+    private notifyContextStateChange(modelChanged: boolean) {
+        this.changeListeners.forEach(callback => callback(modelChanged))
     }
 
     private moveBetweenStacks(sourceStackInfo: PlayingCardStackInfo, targetStackInfo: PlayingCardStackInfo) {
@@ -115,8 +117,13 @@ function useModel() {
     const playingCardsContext = useContext(PlayingCardsContext)
     const [cardStacks, setCardStacks] = useState(playingCardsContext.getCardStacks())
 
-    const handleContextChange = useCallback(() => {
-        setCardStacks([...playingCardsContext.getCardStacks()])
+    const handleContextChange = useCallback((modelChanged: boolean) => {
+        if (modelChanged) {
+            setCardStacks(playingCardsContext.getCardStacks())
+        } else {
+            // We are here because of an aborted drop. Reset the state to cause a re-render
+            setCardStacks([...playingCardsContext.getCardStacks()])
+        }
     }, [playingCardsContext])
 
     useEffect(() => {
@@ -209,31 +216,28 @@ function useDropTarget(stackInfo: Immutable<PlayingCardStackInfo>) {
     }
 }
 
-function useDraggable(card: Immutable<PlayingCardData>, onDrag: (canvasDeltaX: number, canvasDeltaY: number) => void) {
-    const draggableRef = useRef<HTMLDivElement>(null)
-    const [isBeingDragged, setIsBeingDragged] = useState(false)
-    const { setActiveDrag } = PlayingCardsHooks.useDragManager()
-
-    // TODO: Change to ref callback?
-    useEffect(() => {
-        const element = draggableRef.current
-        if (element) {
-            element.draggable = false
+function useDraggable(card: Immutable<PlayingCardData>, onDrag: (canvasDeltaX: number, canvasDeltaY: number) => void, onDragEnd: () => void) {
+    const draggableRef = useCallback((node: HTMLDivElement | null) => {
+        if (node) {
             const handlePointerDown = () => {
                 setIsBeingDragged(true)
                 setActiveDrag(card, onDrag, handleEndDrag)
             }
 
-            element.addEventListener('pointerdown', handlePointerDown)
+            node.addEventListener('pointerdown', handlePointerDown)
             return () => {
-                element.removeEventListener('pointerdown', handlePointerDown)
+                node.removeEventListener('pointerdown', handlePointerDown)
             }
         }
-    }, [draggableRef.current, card, onDrag])
+    }, [])
+
+    const [isBeingDragged, setIsBeingDragged] = useState(false)
+    const { setActiveDrag } = PlayingCardsHooks.useDragManager()
 
     const handleEndDrag = useCallback(() => {
         setIsBeingDragged(false)
-    }, [])
+        onDragEnd()
+    }, [onDragEnd])
 
     return {
         draggableRef,
