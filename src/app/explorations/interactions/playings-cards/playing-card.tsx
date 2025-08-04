@@ -3,6 +3,8 @@ import { OPlayingCardStackBehavior, type PlayingCanvasPosition, type PlayingCard
 import { PlayingCardsHooks } from "./playing-cards-context";
 import type { Immutable } from "@/lib/types";
 import { PlayingCardDropTarget } from "./playing-card-drop-target";
+import { CARD_DIMS_CLASS } from "./data";
+import { cn } from "@/lib/utils";
 
 const STACKED_CARD_Y_OFFSET = 24 // px
 
@@ -38,8 +40,7 @@ export function PlayingCard({ cardStack, stackInfo, position, isPreviousSiblingB
                     pointerEvents: isInDraggedState ? 'none' : 'auto'
                 }}
             >
-                {/* TODO: Images are draggable by default. Provide an image wrapper that applies and draggable={false}?  */}
-                <img src={cardStack.cards[stackInfo.cardIndex].cardImg} className="w-[6rem] h-[9rem]" draggable={false} />
+                <img src={cardStack.cards[stackInfo.cardIndex].cardImg} className={cn("", CARD_DIMS_CLASS)} draggable={false} />
             </div>
             <PlayingCardHolder
                 cardStack={cardStack}

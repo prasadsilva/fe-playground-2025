@@ -1,8 +1,10 @@
-import CardDropTarget from '@/img/playing-cards/droptarget.svg'
+import CardDropTarget from '@/img/playing-cards/droptarget.svg?react'
 import type { PlayingCanvasPosition, PlayingCardStackInfo } from './types'
 import { PlayingCardsHooks } from './playing-cards-context'
 import { type ComponentProps } from 'react'
 import type { Immutable } from '@/lib/types'
+import { cn } from '@/lib/utils'
+import { CARD_DIMS_CLASS } from './data'
 
 export type PlayingCardDropTargetProps = Immutable<{
     stackInfo: PlayingCardStackInfo,
@@ -20,11 +22,11 @@ export function PlayingCardDropTarget({ stackInfo, position, ...props }: Playing
                 left: `${position.x}px`,
                 top: `${position.y}px`,
                 zIndex: stackInfo.cardIndex,
-                opacity: (isActivated && isDragOver) ? 0.4 : 0,
+                opacity: (isActivated && isDragOver) ? 1 : 0,
                 pointerEvents: isActivated ? 'auto' : 'none'
             }}
         >
-            <img src={CardDropTarget} className="w-[6rem] h-[9rem]" draggable={false} />
+            <CardDropTarget className={cn("fill-gray-300 stroke-gray-900 opacity-30 dark:opacity-50", CARD_DIMS_CLASS)} />
         </div>
     )
 }

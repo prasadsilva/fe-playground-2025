@@ -4,6 +4,8 @@ import Card2D from '@/img/playing-cards/2D.svg'
 import Card2H from '@/img/playing-cards/2H.svg'
 import Card2S from '@/img/playing-cards/2S.svg'
 
+export const CARD_DIMS_CLASS = 'w-[6rem] h-[9rem]'
+
 export const initialCardStacks: PlayingCardStackData[] = [
     {
         cards: [
