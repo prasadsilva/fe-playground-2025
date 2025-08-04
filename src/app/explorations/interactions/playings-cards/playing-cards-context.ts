@@ -22,11 +22,23 @@ class PlayingCardsContextData {
         this.canvasElement = null
     }
 
+    private touchInterceptor(e: TouchEvent) {
+        e.preventDefault()
+    }
+
     public getCanvas() {
         return this.canvasElement
     }
     public setCanvas(canvas: HTMLElement | null) {
+        if (this.canvasElement) {
+            this.canvasElement.removeEventListener('touchmove', this.touchInterceptor)
+            this.canvasElement.removeEventListener('touchstart', this.touchInterceptor)
+        }
         this.canvasElement = canvas
+        if (this.canvasElement) {
+            this.canvasElement.addEventListener('touchmove', this.touchInterceptor)
+            this.canvasElement.addEventListener('touchstart', this.touchInterceptor)
+        }
     }
 
     public getCardStacks() { return this.cardStacks }
