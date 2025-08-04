@@ -15,7 +15,7 @@ export function PlayingCardDropTarget({ stackInfo, position, ...props }: Playing
         <div
             {...props}
             ref={dropTargetRef}
-            className={`absolute h-36 w-fit`}
+            className={`absolute size-fit`}
             style={{
                 left: `${position.x}px`,
                 top: `${position.y}px`,
@@ -24,7 +24,7 @@ export function PlayingCardDropTarget({ stackInfo, position, ...props }: Playing
                 pointerEvents: isActivated ? 'auto' : 'none'
             }}
         >
-            <img src={CardDropTarget} className="h-full" />
+            <img src={CardDropTarget} className="w-[6rem] h-[9rem]" draggable={false} />
         </div>
     )
 }

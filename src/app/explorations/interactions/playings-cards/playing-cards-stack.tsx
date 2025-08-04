@@ -13,14 +13,14 @@ export function PlayingCardsStack({ cardStack, stackIndex, ...props }: PlayingCa
         <>
             <div
                 {...props}
-                className={`absolute h-36 w-fit`}
+                className={`absolute size-fit`}
                 style={{
                     left: `${cardStack.position.x}px`,
                     top: `${cardStack.position.y}px`,
                     zIndex: -10,
                     pointerEvents: 'none'
                 }}>
-                <img src={CardOutline} className="h-full" />
+                <img src={CardOutline} className="w-[6rem] h-[9rem]" draggable={false} />
             </div>
             <PlayingCardHolder
                 cardStack={cardStack}

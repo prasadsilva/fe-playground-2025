@@ -31,7 +31,7 @@ export function PlayingCard({ cardStack, stackInfo, position, isPreviousSiblingB
             <div
                 {...props}
                 ref={draggableRef}
-                className="absolute h-36"
+                className="absolute size-fit"
                 style={{
                     transform: `translateX(${currentPosition.x}px) translateY(${currentPosition.y}px)`,
                     zIndex: isInDraggedState ? stackInfo.cardIndex + 100 : stackInfo.cardIndex,
@@ -39,7 +39,7 @@ export function PlayingCard({ cardStack, stackInfo, position, isPreviousSiblingB
                 }}
             >
                 {/* TODO: Images are draggable by default. Provide an image wrapper that applies and draggable={false}?  */}
-                <img src={cardStack.cards[stackInfo.cardIndex].cardImg} className="h-full" draggable={false} />
+                <img src={cardStack.cards[stackInfo.cardIndex].cardImg} className="w-[6rem] h-[9rem]" draggable={false} />
             </div>
             <PlayingCardHolder
                 cardStack={cardStack}
