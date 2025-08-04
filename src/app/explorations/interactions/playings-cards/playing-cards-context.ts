@@ -264,7 +264,11 @@ function useDraggable(stackInfo: Immutable<PlayingCardStackInfo>, position: Play
 
     const draggableRef = useCallback((node: HTMLDivElement | null) => {
         if (node) {
-            const handlePointerDown = () => {
+            const handlePointerDown = (e: PointerEvent) => {
+                // https://stackoverflow.com/a/70737325/2847817
+                if (node.hasPointerCapture(e.pointerId)) {
+                    node.releasePointerCapture(e.pointerId);
+                }
                 setIsBeingDragged(true)
                 setActiveDrag(stackInfo, handleDrag, handleEndDrag)
             }
