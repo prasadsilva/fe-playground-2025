@@ -271,6 +271,8 @@ function useDraggable(stackInfo: Immutable<PlayingCardStackInfo>, position: Play
                 }
                 setIsBeingDragged(true)
                 setActiveDrag(stackInfo, handleDrag, handleEndDrag)
+                e.preventDefault()
+                e.stopPropagation()
             }
 
             node.addEventListener('pointerdown', handlePointerDown)

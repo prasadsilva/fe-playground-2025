@@ -38,6 +38,7 @@ export function PlayingCard({ cardStack, stackInfo, position, isPreviousSiblingB
                     pointerEvents: isInDraggedState ? 'none' : 'auto'
                 }}
             >
+                {/* TODO: Images are draggable by default. Provide an image wrapper that applies and draggable={false}?  */}
                 <img src={cardStack.cards[stackInfo.cardIndex].cardImg} className="h-full" draggable={false} />
             </div>
             <PlayingCardHolder
