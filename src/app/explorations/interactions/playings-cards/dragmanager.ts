@@ -71,7 +71,13 @@ export class DragManager<T> {
         this.clearActiveDragHandler()
     }
 
-    public setActiveDragHandler = (dragData: T, onDragMove: (canvasDltaX: number, canvasDeltaY: number) => void, onDragEnd: () => void) => {
+    public setActiveDragHandler = (
+        dragData: T,
+        dragStartClientX: number,
+        dragStartClientY: number,
+        onDragMove: (canvasDltaX: number, canvasDeltaY: number) => void,
+        onDragEnd: () => void
+    ) => {
         // Already dragging - bail
         if (this.trackedObjDragMoveCallback) {
             console.warn('Already in drag mode')
@@ -86,6 +92,10 @@ export class DragManager<T> {
         this.registerPointerReleaseCallbacks()
 
         this.setDragData(dragData)
+
+        // For touchscreens the originating point is instantaenous. We need to capture those values as soon as possible.
+        this.canvasPointerClientX = dragStartClientX
+        this.canvasPointerClientY = dragStartClientY
     }
     public clearActiveDragHandler = () => {
         // Not dragging - bail

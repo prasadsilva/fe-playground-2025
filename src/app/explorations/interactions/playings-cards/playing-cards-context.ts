@@ -31,20 +31,24 @@ class PlayingCardsContextData {
     }
     public setCanvas(canvas: HTMLElement | null) {
         if (this.canvasElement) {
-            this.canvasElement.removeEventListener('touchmove', this.touchInterceptor)
             this.canvasElement.removeEventListener('touchstart', this.touchInterceptor)
         }
         this.canvasElement = canvas
         if (this.canvasElement) {
-            this.canvasElement.addEventListener('touchmove', this.touchInterceptor)
             this.canvasElement.addEventListener('touchstart', this.touchInterceptor)
         }
     }
 
     public getCardStacks() { return this.cardStacks }
 
-    public setActiveDragHandler(dragData: PlayingCardStackInfo, onDragMove: ((canvasDeltaX: number, canvasDeltaY: number) => void), onDragEnd: (() => void)) {
-        this.dragManager.setActiveDragHandler(dragData, onDragMove, onDragEnd)
+    public setActiveDragHandler(
+        dragData: PlayingCardStackInfo,
+        dragStartClientX: number,
+        dragStartClientY: number,
+        onDragMove: ((canvasDeltaX: number, canvasDeltaY: number) => void),
+        onDragEnd: (() => void)
+    ) {
+        this.dragManager.setActiveDragHandler(dragData, dragStartClientX, dragStartClientY, onDragMove, onDragEnd)
     }
     public addDragStateChangeListener(callback: (stackInfo: PlayingCardStackInfo | null) => void) {
         this.dragManager.addDragStateChangeListener(callback)
@@ -183,9 +187,16 @@ function useDragManager() {
         return () => playingCardsContext.removeDragStateChangeListener(handleActiveDragChange)
     }, [playingCardsContext])
 
-    const setActiveDrag = useCallback((stackInfo: PlayingCardStackInfo, onDragMove: ((canvasDeltaX: number, canvasDeltaY: number) => void), onDragEnd: (() => void)) => {
-        playingCardsContext.setActiveDragHandler(stackInfo, onDragMove, onDragEnd)
-    }, [playingCardsContext])
+    const setActiveDrag = useCallback(
+        (
+            stackInfo: PlayingCardStackInfo,
+            dragStartClientX: number,
+            dragStartClientY: number,
+            onDragMove: ((canvasDeltaX: number, canvasDeltaY: number) => void),
+            onDragEnd: (() => void)
+        ) => {
+            playingCardsContext.setActiveDragHandler(stackInfo, dragStartClientX, dragStartClientY, onDragMove, onDragEnd)
+        }, [playingCardsContext])
 
     const setActiveDrop = useCallback((stackInfo: PlayingCardStackInfo) => {
         playingCardsContext.setActiveDropTarget(stackInfo)
@@ -251,7 +262,7 @@ function useDropTarget(stackInfo: Immutable<PlayingCardStackInfo>) {
 }
 
 function useDraggable(stackInfo: Immutable<PlayingCardStackInfo>, position: PlayingCanvasPosition) {
-    const { setActiveDrag } = PlayingCardsHooks.useDragManager()
+    const { setActiveDrag } = useDragManager()
 
     // Track internal position separtely to allow for uncontrolled positioning while being dragged
     const [currentPosition, setCurrentPosition] = useState({
@@ -262,10 +273,13 @@ function useDraggable(stackInfo: Immutable<PlayingCardStackInfo>, position: Play
         setCurrentPosition(position)
     }, [position])
     const handleDrag = useCallback((canvasDeltaX: number, canvasDeltaY: number) => {
-        setCurrentPosition(prev => ({
-            x: prev.x + canvasDeltaX,
-            y: prev.y + canvasDeltaY
-        }))
+        setCurrentPosition(prev => {
+            // console.log(`setting pos [${prev.x}, ${prev.y}] -> [${prev.x + canvasDeltaX}, ${prev.y + canvasDeltaY}]`)
+            return {
+                x: prev.x + canvasDeltaX,
+                y: prev.y + canvasDeltaY
+            }
+        })
     }, [])
     const handleEndDrag = useCallback(() => {
         setIsBeingDragged(false)
@@ -282,7 +296,7 @@ function useDraggable(stackInfo: Immutable<PlayingCardStackInfo>, position: Play
                     node.releasePointerCapture(e.pointerId);
                 }
                 setIsBeingDragged(true)
-                setActiveDrag(stackInfo, handleDrag, handleEndDrag)
+                setActiveDrag(stackInfo, e.clientX, e.clientY, handleDrag, handleEndDrag)
                 e.preventDefault()
                 e.stopPropagation()
             }
@@ -335,7 +349,6 @@ function useCanvas() {
 
 export const PlayingCardsHooks = {
     useModel,
-    useDragManager,
     useDropTarget,
     useDraggable,
     useCanvas
