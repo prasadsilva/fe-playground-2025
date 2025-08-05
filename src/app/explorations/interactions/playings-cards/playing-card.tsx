@@ -53,13 +53,15 @@ export function PlayingCard({ cardStack, stackInfo, position, isPreviousSiblingB
 }
 
 export function PlayingCardHolder({ cardStack, stackInfo, position, isPreviousSiblingBeingDragged, ...props }: PlayingCardProps) {
+    const droptargetStackInfo = useMemo(() => ({ ...stackInfo, cardIndex: cardStack.cards.length }), [cardStack.cards])
+    const droptargetPosition = useMemo(() => ({ x: cardStack.position.x, y: cardStack.position.y + (cardStack.cards.length * STACKED_CARD_Y_OFFSET) }), [cardStack.position, cardStack.cards])
     return (
         stackInfo.cardIndex < cardStack.cards.length ?
             <PlayingCard {...props} cardStack={cardStack} stackInfo={stackInfo} position={position} isPreviousSiblingBeingDragged={isPreviousSiblingBeingDragged} /> :
             (cardStack.hasDropTarget &&
                 <PlayingCardDropTarget
-                    stackInfo={{ ...stackInfo, cardIndex: cardStack.cards.length }}
-                    position={{ x: cardStack.position.x, y: cardStack.position.y + (cardStack.cards.length * STACKED_CARD_Y_OFFSET) }}
+                    stackInfo={droptargetStackInfo}
+                    position={droptargetPosition}
                 />)
     )
 }
