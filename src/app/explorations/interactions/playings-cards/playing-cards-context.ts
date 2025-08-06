@@ -52,7 +52,7 @@ class PlayingCardsContextData {
     public registerDropTarget(element: HTMLElement, stackInfo: PlayingCardStackInfo, onEnter?: () => void, onLeave?: () => void) {
         this.dragManager.registerDropTarget(element, stackInfo, onEnter, onLeave)
     }
-    
+
     public unregisterDropTarget(element: HTMLElement) {
         this.dragManager.unregisterDropTarget(element)
     }
@@ -136,7 +136,6 @@ class PlayingCardsContextData {
             }
         }
 
-
         this.cardStacks = cardStacksCopy
     }
 }
@@ -201,7 +200,7 @@ function useDragManager() {
     const registerDropTarget = useCallback((element: HTMLElement, stackInfo: PlayingCardStackInfo, onEnter?: () => void, onLeave?: () => void) => {
         playingCardsContext.registerDropTarget(element, stackInfo, onEnter, onLeave)
     }, [playingCardsContext])
-    
+
     const unregisterDropTarget = useCallback((element: HTMLElement) => {
         playingCardsContext.unregisterDropTarget(element)
     }, [playingCardsContext])
@@ -216,7 +215,7 @@ function useDragManager() {
 
 function useDropTarget(stackInfo: Immutable<PlayingCardStackInfo>) {
     const { activeDragInfo, registerDropTarget, unregisterDropTarget } = useDragManager()
-    const [isDragCardOver, setIsDragCardOver] = useState(false)
+    const [isDragOver, setIsDragOver] = useState(false)
 
     const isActivated = useMemo(() => {
         return activeDragInfo && activeDragInfo.stackIndex !== stackInfo.stackIndex
@@ -224,13 +223,13 @@ function useDropTarget(stackInfo: Immutable<PlayingCardStackInfo>) {
 
     const handleDropTargetEnter = useCallback(() => {
         if (isActivated) {
-            setIsDragCardOver(true)
+            setIsDragOver(true)
         }
     }, [isActivated])
 
     const handleDropTargetLeave = useCallback(() => {
         if (isActivated) {
-            setIsDragCardOver(false)
+            setIsDragOver(false)
         }
     }, [isActivated])
 
@@ -245,14 +244,14 @@ function useDropTarget(stackInfo: Immutable<PlayingCardStackInfo>) {
 
     useEffect(() => {
         if (!activeDragInfo) {
-            setIsDragCardOver(false)
+            setIsDragOver(false)
         }
     }, [activeDragInfo])
 
     return {
         dropTargetRef,
         isActivated,
-        isDragOver: isDragCardOver
+        isDragOver
     }
 }
 
@@ -269,7 +268,6 @@ function useDraggable(stackInfo: Immutable<PlayingCardStackInfo>, position: Play
     }, [position])
     const handleDrag = useCallback((canvasDeltaX: number, canvasDeltaY: number) => {
         setCurrentPosition(prev => {
-            // console.log(`setting pos [${prev.x}, ${prev.y}] -> [${prev.x + canvasDeltaX}, ${prev.y + canvasDeltaY}]`)
             return {
                 x: prev.x + canvasDeltaX,
                 y: prev.y + canvasDeltaY
