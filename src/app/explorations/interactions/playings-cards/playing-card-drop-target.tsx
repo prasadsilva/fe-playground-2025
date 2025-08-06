@@ -4,7 +4,7 @@ import { PlayingCardsHooks } from './playing-cards-context'
 import { type ComponentProps } from 'react'
 import type { Immutable } from '@/lib/types'
 import { cn } from '@/lib/utils'
-import { CARD_DIMS_CLASS } from './data'
+import { CARD_DIMS_CLASS } from './constants'
 
 export type PlayingCardDropTargetProps = Immutable<{
     stackInfo: PlayingCardStackInfo,
