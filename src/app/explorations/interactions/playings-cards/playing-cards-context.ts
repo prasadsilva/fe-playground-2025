@@ -10,7 +10,7 @@ type PlayingCardsContextChangeListener = (modelChanged: boolean) => void
 class PlayingCardsContextData {
     private cardStacks: Immutable<PlayingCardStackData[]>
     private changeListeners: Set<PlayingCardsContextChangeListener>
-    private dragManager: DragManager<PlayingCardStackInfo>
+    public dragManager: DragManager<PlayingCardStackInfo>
 
     public constructor(cardStacksParam: PlayingCardStackData[]) {
         this.cardStacks = deepFreeze(cardStacksParam)
@@ -20,36 +20,8 @@ class PlayingCardsContextData {
 
     public cleanup() {
         // Clean up canvas reference and any listeners
-        this.setCanvas(null)
+        this.dragManager.setCanvasElement(null)
         this.changeListeners.clear()
-    }
-
-    private touchInterceptor = (e: TouchEvent) => {
-        // Only prevent default touch behavior if we're actively dragging
-        if (this.dragManager.isActivelyDragging()) {
-            e.preventDefault()
-        }
-    }
-
-    public getCanvas() {
-        return this.dragManager.getCanvasElement()
-    }
-    public setCanvas(canvas: HTMLElement | null) {
-        // Handle touch prevention for the current canvas element
-        const currentCanvas = this.getCanvas()
-        if (currentCanvas) {
-            currentCanvas.removeEventListener('touchstart', this.touchInterceptor)
-            currentCanvas.removeEventListener('touchmove', this.touchInterceptor)
-        }
-        
-        // Update DragManager with the new canvas
-        this.dragManager.setCanvasElement(canvas)
-        
-        // Add touch prevention to the new canvas element
-        if (canvas) {
-            canvas.addEventListener('touchstart', this.touchInterceptor)
-            canvas.addEventListener('touchmove', this.touchInterceptor)
-        }
     }
 
     public getCardStacks() { return this.cardStacks }
@@ -343,16 +315,16 @@ function useCanvas() {
     }
     const [isCanvasAvailable, setIsCanvasAvailable] = useState(false)
     const canvasRef = useCallback((node: HTMLDivElement | null) => {
-        if (playingCardsContext.getCanvas() && node) {
+        if (playingCardsContext.dragManager.getCanvasElement() && node) {
             console.warn('Unable to register canvas element. A canvas is already registered.')
             return
         }
-        playingCardsContext.setCanvas(node)
+        playingCardsContext.dragManager.setCanvasElement(node)
         setIsCanvasAvailable(node !== null)
     }, [])
 
     const createCanvasPortal = (node: JSX.Element) => {
-        const canvas = playingCardsContext.getCanvas()
+        const canvas = playingCardsContext.dragManager.getCanvasElement()
         if (canvas !== null) {
             return createPortal(node, canvas)
         }

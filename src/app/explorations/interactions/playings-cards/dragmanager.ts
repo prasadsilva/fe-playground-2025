@@ -32,13 +32,34 @@ export class DragManager<T> {
         this.currentDropTarget = null
     }
 
+    private touchInterceptor = (e: TouchEvent) => {
+        // Only prevent default touch behavior if we're actively dragging
+        if (this.isActivelyDragging()) {
+            e.preventDefault()
+        }
+    }
+
     private setDragData(dragData: T | null) {
         this.currentDragData = dragData
         this.dragStateChangeListeners.forEach(callback => callback(this.currentDragData))
     }
 
     public setCanvasElement(canvas: HTMLElement | null) {
+        // Handle touch prevention for the current canvas element
+        const currentCanvas = this.getCanvasElement()
+        if (currentCanvas) {
+            currentCanvas.removeEventListener('touchstart', this.touchInterceptor)
+            currentCanvas.removeEventListener('touchmove', this.touchInterceptor)
+        }
+        
+        // Update canvas element
         this.canvasElement = canvas
+        
+        // Add touch prevention to the new canvas element
+        if (canvas) {
+            canvas.addEventListener('touchstart', this.touchInterceptor)
+            canvas.addEventListener('touchmove', this.touchInterceptor)
+        }
     }
 
     public getCanvasElement(): HTMLElement | null {
