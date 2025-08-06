@@ -31,17 +31,19 @@ This is an exploration of the latest web technologies and frameworks used in fro
   * Index lists all launches available in the public API.
   * Clicking on an individual launch entry navigates to its detail view.
 * Added current stack to About page.
+* Added Playing Cards demo
+  * Drag-n-drop capability and related logic managed via context.
+  * Drag-n-drop works as expected on touchscreen devices (mobiles, etc.).
 
 ## Todo/Ideas
 * Add animation library and demo
 * Prettify the SpaceX launch detail view
 * Add a D3.js visualization sample (time series chart?)
   * Find a free time series API
-* Add React Flow exploration
+* Add React Flow exploration (node based editor/diagramming)
 * Add app state support (Redux?)
 * Add data fetching support (Tanstack Query?)
 * Add a three.js visualization sample (simple FBX model)
 * Add a GraphQL data source and visualization sample (SpaceX launches?)
 * Add virtual scrolling sample
-* Add code splitting (see Vite docs), if it's not already automatic
 * ...
