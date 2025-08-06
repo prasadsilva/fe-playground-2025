@@ -11,7 +11,7 @@ export function App() {
                 <SidebarProvider>
                     <AppSidebar />
                     <main className="relative w-full overflow-x-scroll">
-                        <SidebarTrigger className="absolute bottom-0" />
+                        <SidebarTrigger className="fixed bottom-0" />
                         <Outlet />
                         <TanStackRouterDevtools />
                     </main>
