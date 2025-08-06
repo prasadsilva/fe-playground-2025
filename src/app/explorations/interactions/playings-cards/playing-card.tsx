@@ -3,10 +3,9 @@ import { OPlayingCardStackBehavior, type PlayingCanvasPosition, type PlayingCard
 import { PlayingCardsHooks } from "./playing-cards-context";
 import type { Immutable } from "@/lib/types";
 import { PlayingCardDropTarget } from "./playing-card-drop-target";
-import { CARD_DIMS_CLASS } from "./data";
+import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from "./constants";
 import { cn } from "@/lib/utils";
 
-const STACKED_CARD_Y_OFFSET = 24 // px
 
 export type PlayingCardProps = Immutable<{
     cardStack: PlayingCardStackData,
@@ -24,7 +23,7 @@ export function PlayingCard({ cardStack, stackInfo, position, isPreviousSiblingB
     )
     const positionForSiblingLayout = cardStack.behavior === OPlayingCardStackBehavior.MoveAllNextSiblings ? currentPosition : position
     const nextSiblingPosition = useMemo<PlayingCanvasPosition>(() =>
-        ({ x: positionForSiblingLayout.x, y: positionForSiblingLayout.y + STACKED_CARD_Y_OFFSET }),
+        ({ x: positionForSiblingLayout.x, y: positionForSiblingLayout.y + LAYOUT_CONSTANTS.STACKED_CARD_Y_OFFSET }),
         [positionForSiblingLayout]
     )
 
@@ -36,7 +35,7 @@ export function PlayingCard({ cardStack, stackInfo, position, isPreviousSiblingB
                 className="absolute size-fit"
                 style={{
                     transform: `translateX(${currentPosition.x}px) translateY(${currentPosition.y}px)`,
-                    zIndex: isInDraggedState ? stackInfo.cardIndex + 100 : stackInfo.cardIndex,
+                    zIndex: isInDraggedState ? stackInfo.cardIndex + LAYOUT_CONSTANTS.DRAG_Z_INDEX_OFFSET : stackInfo.cardIndex,
                     pointerEvents: isInDraggedState ? 'none' : 'auto'
                 }}
             >
@@ -54,7 +53,7 @@ export function PlayingCard({ cardStack, stackInfo, position, isPreviousSiblingB
 
 export function PlayingCardHolder({ cardStack, stackInfo, position, isPreviousSiblingBeingDragged, ...props }: PlayingCardProps) {
     const droptargetStackInfo = useMemo(() => ({ ...stackInfo, cardIndex: cardStack.cards.length }), [cardStack.cards])
-    const droptargetPosition = useMemo(() => ({ x: cardStack.position.x, y: cardStack.position.y + (cardStack.cards.length * STACKED_CARD_Y_OFFSET) }), [cardStack.position, cardStack.cards])
+    const droptargetPosition = useMemo(() => ({ x: cardStack.position.x, y: cardStack.position.y + (cardStack.cards.length * LAYOUT_CONSTANTS.STACKED_CARD_Y_OFFSET) }), [cardStack.position, cardStack.cards])
     return (
         stackInfo.cardIndex < cardStack.cards.length ?
             <PlayingCard {...props} cardStack={cardStack} stackInfo={stackInfo} position={position} isPreviousSiblingBeingDragged={isPreviousSiblingBeingDragged} /> :

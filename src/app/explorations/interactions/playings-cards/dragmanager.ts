@@ -112,7 +112,7 @@ export class DragManager<T> {
         this.dragStateChangeListeners.add(callback)
         this.usageCount++
     }
-    public removedragStateChangeListener(callback: (dragCard: T | null) => void) {
+    public removeDragStateChangeListener(callback: (dragCard: T | null) => void) {
         this.dragStateChangeListeners.delete(callback)
         this.usageCount--
     }
@@ -177,7 +177,7 @@ export class DragManager<T> {
         dragData: T,
         dragStartClientX: number,
         dragStartClientY: number,
-        onDragMove: (canvasDltaX: number, canvasDeltaY: number) => void,
+        onDragMove: (canvasDeltaX: number, canvasDeltaY: number) => void,
         onDragEnd: () => void
     ) => {
         // Already dragging - bail

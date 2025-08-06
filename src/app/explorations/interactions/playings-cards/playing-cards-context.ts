@@ -46,7 +46,7 @@ class PlayingCardsContextData {
         this.dragManager.addDragStateChangeListener(callback)
     }
     public removeDragStateChangeListener(callback: (stackInfo: PlayingCardStackInfo | null) => void) {
-        this.dragManager.removedragStateChangeListener(callback)
+        this.dragManager.removeDragStateChangeListener(callback)
     }
 
     public registerDropTarget(element: HTMLElement, stackInfo: PlayingCardStackInfo, onEnter?: () => void, onLeave?: () => void) {

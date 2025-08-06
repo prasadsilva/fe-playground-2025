@@ -6,9 +6,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function deepFreeze<T>(obj: T) {
-  var propNames = Object.getOwnPropertyNames(obj);
-  for (let name of propNames) {
-    let value = (obj as any)[name];
+  const propNames = Object.getOwnPropertyNames(obj);
+  for (const name of propNames) {
+    const value = (obj as Record<PropertyKey, unknown>)[name];
     if (value && typeof value === "object") {
       deepFreeze(value);
     }

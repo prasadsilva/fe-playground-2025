@@ -3,7 +3,7 @@ import type { PlayingCardStackData } from "./types"
 import { PlayingCardHolder } from "./playing-card"
 import CardOutline from '@/img/playing-cards/outline.svg?react'
 import type { Immutable } from "@/lib/types"
-import { CARD_DIMS_CLASS } from "./data"
+import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from "./constants"
 import { cn } from "@/lib/utils"
 
 export type PlayingCardsStackProps = Immutable<{
@@ -19,7 +19,7 @@ export function PlayingCardsStack({ cardStack, stackIndex, ...props }: PlayingCa
                 style={{
                     left: `${cardStack.position.x}px`,
                     top: `${cardStack.position.y}px`,
-                    zIndex: -10,
+                    zIndex: LAYOUT_CONSTANTS.STACK_OUTLINE_Z_INDEX,
                     pointerEvents: 'none'
                 }}>
                 <CardOutline className={cn("stroke-gray-700 dark:stroke-gray-300", CARD_DIMS_CLASS)} />
