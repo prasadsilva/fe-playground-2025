@@ -9,7 +9,7 @@ type PlayingCardsContextChangeListener = (modelChanged: boolean) => void
 class PlayingCardsContextData {
     private cardStacks: Immutable<PlayingCardStackData[]>
     private changeListeners: Set<PlayingCardsContextChangeListener>
-    public dragManager: DragManager<PlayingCardStackInfo>
+    private dragManager: DragManager<PlayingCardStackInfo>
 
     public constructor(cardStacksParam: PlayingCardStackData[]) {
         this.cardStacks = deepFreeze(cardStacksParam)
@@ -21,6 +21,14 @@ class PlayingCardsContextData {
         // Clean up canvas reference and any listeners
         this.dragManager.setCanvasElement(null)
         this.changeListeners.clear()
+    }
+
+    public getCanvasElement() {
+        return this.dragManager.getCanvasElement()
+    }
+
+    public setCanvasElement(canvas: HTMLElement | null) {
+        this.dragManager.setCanvasElement(canvas)
     }
 
     public getCardStacks() { return this.cardStacks }
@@ -314,11 +322,11 @@ function useCanvas() {
     }
     const [isCanvasAvailable, setIsCanvasAvailable] = useState(false)
     const canvasRef = useCallback((node: HTMLDivElement | null) => {
-        if (playingCardsContext.dragManager.getCanvasElement() && node) {
+        if (playingCardsContext.getCanvasElement() && node) {
             console.warn('Unable to register canvas element. A canvas is already registered.')
             return
         }
-        playingCardsContext.dragManager.setCanvasElement(node)
+        playingCardsContext.setCanvasElement(node)
         setIsCanvasAvailable(node !== null)
     }, [])
 
