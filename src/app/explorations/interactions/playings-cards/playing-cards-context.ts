@@ -1,9 +1,8 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type JSX } from "react"
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { OPlayingCardStackBehavior, type PlayingCanvasPosition, type PlayingCardStackData, type PlayingCardStackInfo } from "./types"
 import type { Immutable } from "@/lib/types"
 import { deepFreeze } from "@/lib/utils"
 import { DragManager } from "./dragmanager"
-import { createPortal } from "react-dom"
 
 type PlayingCardsContextChangeListener = (modelChanged: boolean) => void
 
@@ -323,18 +322,9 @@ function useCanvas() {
         setIsCanvasAvailable(node !== null)
     }, [])
 
-    const createCanvasPortal = (node: JSX.Element) => {
-        const canvas = playingCardsContext.dragManager.getCanvasElement()
-        if (canvas !== null) {
-            return createPortal(node, canvas)
-        }
-        return null
-    }
-
     return {
         canvasRef,
-        isCanvasAvailable,
-        createCanvasPortal
+        isCanvasAvailable
     }
 }
 
