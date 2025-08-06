@@ -1,3 +1,10 @@
+interface DropTargetData<T> {
+    element: HTMLElement
+    data: T
+    onEnter?: (data: T) => void
+    onLeave?: (data: T) => void
+}
+
 export class DragManager<T> {
     private trackedObjDragMoveCallback: ((canvasDeltaX: number, canvasDeltaY: number) => void) | undefined
     private trackedObjDragEndCallback: (() => void) | undefined
@@ -7,6 +14,9 @@ export class DragManager<T> {
     private currentDragData: T | null
     private dragStateChangeListeners: Set<(dragCard: T | null) => void>
     private dropCallback: (dragData: T) => void | null
+    private canvasElement: HTMLElement | null
+    private dropTargetRegistry: Map<HTMLElement, DropTargetData<T>>
+    private currentDropTarget: DropTargetData<T> | null
 
     public constructor(dropCallback: typeof this.dropCallback) {
         this.trackedObjDragMoveCallback = undefined
@@ -17,6 +27,9 @@ export class DragManager<T> {
         this.currentDragData = null
         this.dragStateChangeListeners = new Set
         this.dropCallback = dropCallback
+        this.canvasElement = null
+        this.dropTargetRegistry = new Map()
+        this.currentDropTarget = null
     }
 
     private setDragData(dragData: T | null) {
@@ -24,19 +37,63 @@ export class DragManager<T> {
         this.dragStateChangeListeners.forEach(callback => callback(this.currentDragData))
     }
 
+    public setCanvasElement(canvas: HTMLElement | null) {
+        this.canvasElement = canvas
+    }
+
+    public getCanvasElement(): HTMLElement | null {
+        return this.canvasElement
+    }
+
+    public registerDropTarget(element: HTMLElement, data: T, onEnter?: (data: T) => void, onLeave?: (data: T) => void) {
+        this.dropTargetRegistry.set(element, { element, data, onEnter, onLeave })
+    }
+
+    public unregisterDropTarget(element: HTMLElement) {
+        const dropTarget = this.dropTargetRegistry.get(element)
+        if (dropTarget && this.currentDropTarget === dropTarget) {
+            this.handleDropTargetLeave()
+        }
+        this.dropTargetRegistry.delete(element)
+    }
+
+    private handleDropTargetEnter(dropTarget: DropTargetData<T>) {
+        if (this.currentDropTarget) {
+            this.handleDropTargetLeave()
+        }
+        this.currentDropTarget = dropTarget
+        if (dropTarget.onEnter) {
+            dropTarget.onEnter(dropTarget.data)
+        }
+    }
+
+    private handleDropTargetLeave() {
+        if (this.currentDropTarget?.onLeave) {
+            this.currentDropTarget.onLeave(this.currentDropTarget.data)
+        }
+        this.currentDropTarget = null
+    }
+
+    private findDropTargetAtPoint(x: number, y: number): DropTargetData<T> | null {
+        const elementAtPoint = document.elementFromPoint(x, y)
+        if (!elementAtPoint) return null
+
+        // Check if the element itself is a drop target
+        for (const [element, dropTarget] of this.dropTargetRegistry) {
+            if (element === elementAtPoint || element.contains(elementAtPoint)) {
+                return dropTarget
+            }
+        }
+        return null
+    }
+
     public addDragStateChangeListener(callback: (dragCard: T | null) => void) {
         this.dragStateChangeListeners.add(callback)
-        if (this.usageCount === 0) {
-            document.body.addEventListener('pointermove', this.trackCanvasPointer)
-        }
         this.usageCount++
     }
     public removedragStateChangeListener(callback: (dragCard: T | null) => void) {
         this.dragStateChangeListeners.delete(callback)
         this.usageCount--
-        if (this.usageCount === 0) {
-            document.body.removeEventListener('pointermove', this.trackCanvasPointer)
-        }
     }
 
     private trackCanvasPointer = (e: PointerEvent) => {
@@ -47,28 +104,52 @@ export class DragManager<T> {
         }
         this.canvasPointerClientX = e.clientX
         this.canvasPointerClientY = e.clientY
+
+        // Only check for drop targets during an active drag
+        if (this.currentDragData) {
+            const dropTargetAtPoint = this.findDropTargetAtPoint(e.clientX, e.clientY)
+            
+            if (dropTargetAtPoint !== this.currentDropTarget) {
+                if (this.currentDropTarget) {
+                    this.handleDropTargetLeave()
+                }
+                if (dropTargetAtPoint) {
+                    this.handleDropTargetEnter(dropTargetAtPoint)
+                }
+            }
+        }
     }
 
     private registerPointerReleaseCallbacks = () => {
+        document.body.addEventListener('pointermove', this.trackCanvasPointer)
         document.body.addEventListener('pointerup', this.handlePointerReleaseNative)
         document.body.addEventListener('pointerleave', this.handlePointerInvalidNative)
         document.body.addEventListener('pointercancel', this.handlePointerInvalidNative)
     }
 
     private unregisterPointerReleaseCallbacks = () => {
+        document.body.removeEventListener('pointermove', this.trackCanvasPointer)
         document.body.removeEventListener('pointerup', this.handlePointerReleaseNative)
         document.body.removeEventListener('pointerleave', this.handlePointerInvalidNative)
         document.body.removeEventListener('pointercancel', this.handlePointerInvalidNative)
     }
 
-    private handlePointerReleaseNative = (_e: PointerEvent) => {
+    private handlePointerReleaseNative = () => {
         if (this.currentDragData) {
             this.dropCallback(this.currentDragData)
         }
         this.clearActiveDragHandler()
     }
-    private handlePointerInvalidNative = (_e: PointerEvent) => {
+    private handlePointerInvalidNative = () => {
         this.clearActiveDragHandler()
+    }
+
+    public getCurrentDropTarget(): T | null {
+        return this.currentDropTarget?.data || null
+    }
+
+    public isActivelyDragging(): boolean {
+        return this.currentDragData !== null
     }
 
     public setActiveDragHandler = (
@@ -102,6 +183,11 @@ export class DragManager<T> {
         if (!this.trackedObjDragMoveCallback) {
             console.warn('Unable to clear drag object. Not currently dragging an element.')
             return
+        }
+
+        // Clear drop target state
+        if (this.currentDropTarget) {
+            this.handleDropTargetLeave()
         }
 
         // Clear elements
